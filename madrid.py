@@ -604,15 +604,11 @@ def generar_pdf(datos, x, y, filename):
     zepa_url = urls.get('zepa')
     lic_url = urls.get('lic')
     enp_url = urls.get('enp')
-    esteparias_url = urls.get('esteparias')
+    corredores_url = urls.get('corredores')
     uso_suelo_url = urls.get('uso_suelo')
-    tortuga_url = urls.get('tortuga')
-    perdicera_url = urls.get('perdicera')
-    nutria_url = urls.get('nutria')
-    fartet_url = urls.get('fartet')
-    malvasia_url = urls.get('malvasia')
-    garbancillo_url = urls.get('garbancillo')
-    flora_url = urls.get('flora')
+    humedales_url = urls.get('humedales')
+    biosfera_url = urls.get('biosfera')
+    nitratos_url = urls.get('nitratos')            
     
     # Crear instancia de la clase personalizada
     pdf = CustomPDF(logo_path)
@@ -705,17 +701,13 @@ def generar_pdf(datos, x, y, filename):
     zepa_key = "afección ZEPA"
     lic_key = "afección LIC"
     enp_key = "afección ENP"
-    esteparias_key = "afección ESTEPARIAS"
+    corredores_key = "afección CORREDORES"
     uso_suelo_key = "Afección PLANEAMIENTO"
-    tortuga_key = "Afección PLAN RECUPERACION TORTUGA MORA"
-    perdicera_key = "Afección PLAN RECUPERACION ÁGUILA PERDICERA"
-    nutria_key = "Afección PLAN RECUPERACION NUTRIA"
-    fartet_key = "Afección PLAN RECUPERACION FARTET"
-    malvasia_key = "Afección PLAN RECUPERACION MALVASIA"
-    garbancillo_key = "Afección PLAN RECUPERACION GARBANCILLO"
-    flora_key = "Afección PLAN RECUPERACION FLORA"
+    humedales_key = "Afección HUMEDALES"
+    biosfera_key = "Afección RESERVA DE LA BIOSFERA"
+    nitratos_key = "Afección CONTAMINACION POR NITRATOS"
         
-# === PROCESAR TODAS LAS CAPAS (VP, ZEPA, LIC, ENP) ===
+# === PROCESAR TODAS LAS CAPAS ===
     def procesar_capa(url, key, valor_inicial, campos, detectado_list):
         valor = datos.get(key, "").strip()
         if valor and not valor.startswith("No afecta") and not valor.startswith("Error"):
@@ -740,7 +732,7 @@ def generar_pdf(datos, x, y, filename):
     vp_detectado = []
     vp_valor = procesar_capa(
         vp_url, "afección VP", "No afecta a ninguna Vía Pecuaria",
-        ["vp_cod", "vp_nb", "vp_mun", "vp_sit_leg", "vp_anch_lg"],
+        ["CD_VP", "DS_NOMBRE", "DS_MUNI", "DS_TIPO"],
         vp_detectado
     )
 
@@ -748,7 +740,7 @@ def generar_pdf(datos, x, y, filename):
     zepa_detectado = []
     zepa_valor = procesar_capa(
         zepa_url, "afección ZEPA", "No afecta a ninguna Zona de especial protección para las aves",
-        ["site_code", "site_name"],
+        ["CD_ZEPA", "DS_ZEPA"],
         zepa_detectado
     )
 
@@ -756,7 +748,7 @@ def generar_pdf(datos, x, y, filename):
     lic_detectado = []
     lic_valor = procesar_capa(
         lic_url, "afección LIC", "No afecta a ningún Lugar de Interés Comunitario",
-        ["site_code", "site_name"],
+        ["CD_ZEC_CODE", "DS_ZEC_NAME"],
         lic_detectado
     )
 
@@ -764,81 +756,49 @@ def generar_pdf(datos, x, y, filename):
     enp_detectado = []
     enp_valor = procesar_capa(
         enp_url, "afección ENP", "No afecta a ningún Espacio Natural Protegido",
-        ["nombre", "figura"],
+        ["DS_NOMBRE", "DS_FIGURA"],
         enp_detectado
-    )
-
-    # === ESTEPARIAS ===
-    esteparias_detectado = []
-    esteparias_valor = procesar_capa(
-        esteparias_url, "afección esteparias", "No afecta a zona de distribución de aves esteparias",
-        ["cuad_10km", "especie", "nombre"],
-        esteparias_detectado
     )
 
     # === USO DEL SUELO ===
     uso_suelo_detectado = []
     uso_suelo_valor = procesar_capa(
         uso_suelo_url, "afección uso_suelo", "No afecta a ningún uso del suelo protegido",
-        ["Uso_Especifico", "Clasificacion"],
+        ["DS_CALI", "DS_CLASI"],
         uso_suelo_detectado
     )
     
-    # === TORTUGA MORA ===
-    tortuga_detectado = []
-    tortuga_valor = procesar_capa(
-        tortuga_url, "afección tortuga", "No afecta al Plan de Recuperación de la tortuga mora",
-        ["cat_id", "cat_desc"],
-        tortuga_detectado
+    # === CORREDORES ===
+    corredores_detectado = []
+    corredores_valor = procesar_capa(
+        corredores_url, "afección corredores", "No afecta a Corredores Ecológicos",
+        ["DS_TIPO_CORREDOR", "DS_NOMCORREDOR"],
+        corredores_detectado
     )
 
-    # === AGUILA PERDICERA ===
-    perdicera_detectado = []
-    perdicera_valor = procesar_capa(
-        perdicera_url, "afección perdicera", "No afecta al Plan de Recuperación del águila perdicera",
-        ["zona", "nombre"],
-        perdicera_detectado
+    # === HUMEDALES ===
+    humedales_detectado = []
+    humedales_valor = procesar_capa(
+        humedales_url, "afección humedales", "No afecta a Humedales",
+        ["DS_ZONA", "DS_HUMEDAL"],
+        humedales_detectado
+    ) 
+
+    # === RESERVA DE LA BIOSFERA ===
+    biosfera_detectado = []
+    biosfera_valor = procesar_capa(
+        biosfera_url, "afección biosfera", "No afecta a Reserva de la Biosfera",
+        ["CD_RESERVA", "DS_RESERVA"],
+        biosfera_detectado
     )
 
-    # === NUTRIA ===
-    nutria_detectado = []
-    nutria_valor = procesar_capa(
-        nutria_url, "afección nutria", "No afecta al Plan de Recuperación de la nutria",
-        ["tipo_de_ar", "nombre"],
-        nutria_detectado
+    # === NITRATOS ===    
+    nitratos_detectado = []
+    nitratos_valor = procesar_capa(
+        nitratos_url, "afección nitratos", "No afecta a Zonas Contaminados por Nitratos",
+        ["CD_ZONA", "DS_DESCRIPCIO"],
+        nitratos_detectado
     )    
-
-    # === FARTET ===
-    fartet_detectado = []
-    fartet_valor = procesar_capa(
-        fartet_url, "afección fartet", "No afecta al Plan de Recuperación del fartet",
-        ["clasificac", "nombre"],
-        fartet_detectado
-    )
-
-    # === MALVASIA ===
-    malvasia_detectado = []
-    malvasia_valor = procesar_capa(
-        malvasia_url, "afección malvasia", "No afecta al Plan de Recuperación de la malvasia",
-        ["clasificac", "nombre"],
-        malvasia_detectado
-    )
-
-    # === GARBANCILLO ===
-    garbancillo_detectado = []
-    garbancillo_valor = procesar_capa(
-        garbancillo_url, "afección garbancillo", "No afecta al Plan de Recuperación del garbancillo",
-        ["tipo", "nombre"],
-        garbancillo_detectado
-    )
-
-    # === FLORA ===
-    flora_detectado = []
-    flora_valor = procesar_capa(
-        flora_url, "afección flora", "No afecta al Plan de Recuperación de flora",
-        ["tipo", "nombre"],
-        flora_detectado
-    )
 
     # === MUP (ya funciona bien, lo dejamos igual) ===
     mup_valor = datos.get("afección MUP", "").strip()
@@ -867,7 +827,7 @@ def generar_pdf(datos, x, y, filename):
         else:
             otras_afecciones.append((key_corregido, valor if valor else "No afecta"))
 
-    # Solo incluir MUP, VP, ZEPA, LIC, ENP, ESTEPARIAS, PLANEAMIENTO, TORTUGA, PERDICERA, NUTRIA, FARTET, MALVASIA, GARBANCILLO, FLORA en "otras afecciones" si NO tienen detecciones
+    # Solo incluir en "otras afecciones" si NO tienen detecciones
     if not flora_detectado:
         otras_afecciones.append(("Afección a flora", flora_valor if flora_valor else "No afecta a Plan de Recuperación de flora"))
     if not garbancillo_detectado:
@@ -1918,25 +1878,20 @@ if submitted:
             }
 
             # === 6. CONSULTAR AFECCIONES ===
-            afeccion_corredores = consultar_wfs_seguro(query_geom, corredores_url, "FLORA", campo_nombre="tipo")
-            afeccion_garbancillo = consultar_wfs_seguro(query_geom, garbancillo_url, "GARBANCILLO", campo_nombre="tipo")
-            afeccion_malvasia = consultar_wfs_seguro(query_geom, malvasia_url, "MALVASIA", campo_nombre="clasificac")
-            afeccion_fartet = consultar_wfs_seguro(query_geom, fartet_url, "FARTET", campo_nombre="clasificac")
-            afeccion_nutria = consultar_wfs_seguro(query_geom, nutria_url, "NUTRIA", campo_nombre="tipo_de_ar")
-            afeccion_perdicera = consultar_wfs_seguro(query_geom, perdicera_url, "ÁGUILA PERDICERA", campo_nombre="zona")
-            afeccion_tortuga = consultar_wfs_seguro(query_geom, tortuga_url, "TORTUGA MORA", campo_nombre="cat_desc")
-            afeccion_uso_suelo = consultar_wfs_seguro(query_geom, uso_suelo_url, "PLANEAMIENTO", campo_nombre="Clasificacion")
-            afeccion_esteparias = consultar_wfs_seguro(query_geom, esteparias_url, "ESTEPARIAS", campo_nombre="nombre")
-            afeccion_enp = consultar_wfs_seguro(query_geom, enp_url, "ENP", campo_nombre="nombre")
-            afeccion_zepa = consultar_wfs_seguro(query_geom, zepa_url, "ZEPA", campo_nombre="site_name")
-            afeccion_lic = consultar_wfs_seguro(query_geom, lic_url, "LIC", campo_nombre="site_name")
-            afeccion_vp = consultar_wfs_seguro(query_geom, vp_url, "VP", campo_nombre="vp_nb")
-            afeccion_tm = consultar_wfs_seguro(query_geom, tm_url, "TM", campo_nombre="nameunit")
+            afeccion_corredores = consultar_wfs_seguro(query_geom, corredores_url, "CORREDOR", campo_nombre="DS_TIPO_CORREDOR")
+            afeccion_humedales = consultar_wfs_seguro(query_geom, humedales_url, "HUMEDALES", campo_nombre="DS_ZONA")
+            afeccion_biosfera = consultar_wfs_seguro(query_geom, biosfera_url, "BIOESFERA", campo_nombre="CD_RESERVA")
+            afeccion_nitratos = consultar_wfs_seguro(query_geom, nitratos_url, "NATRATOS", campo_nombre="CD_ZONA")           
+            afeccion_uso_suelo = consultar_wfs_seguro(query_geom, uso_suelo_url, "PLANEAMIENTO", campo_nombre="DS_CLASI")            
+            afeccion_enp = consultar_wfs_seguro(query_geom, enp_url, "ENP", campo_nombre="DS_NOMBRE")
+            afeccion_zepa = consultar_wfs_seguro(query_geom, zepa_url, "ZEPA", campo_nombre="DS_ZEPA")
+            afeccion_lic = consultar_wfs_seguro(query_geom, lic_url, "LIC", campo_nombre="DS_ZEC_NAME")
+            afeccion_vp = consultar_wfs_seguro(query_geom, vp_url, "VP", campo_nombre="DS_NOMBRE")            
             afeccion_mup = consultar_wfs_seguro(
                 query_geom, mup_url, "MUP",
-                campos_mup=["id_monte:ID", "nombremont:Nombre", "municipio:Municipio", "propiedad:Propiedad"]
+                campos_mup=["CD_UP:ID", "DS_NOMBRE:Nombre", "DS_MUNICIPIO:Municipio", "DS_PROPIETARIO:Propiedad"]
             )
-            afecciones = [afeccion_flora, afeccion_garbancillo, afeccion_malvasia, afeccion_fartet, afeccion_nutria, afeccion_perdicera, afeccion_tortuga, afeccion_uso_suelo, afeccion_esteparias, afeccion_enp, afeccion_zepa, afeccion_lic, afeccion_vp, afeccion_tm, afeccion_mup]
+            afecciones = [afeccion_corredores, afeccion_humedales, afeccion_biosfera, afeccion_nitratos, afeccion_uso_suelo, afeccion_enp, afeccion_zepa, afeccion_lic, afeccion_vp, afeccion_mup]
 
             # === 7. CREAR DICCIONARIO `datos` ===
             datos = {
@@ -1946,16 +1901,11 @@ if submitted:
                 "objeto de la solicitud": objeto,
                 "afección MUP": afeccion_mup, "afección VP": afeccion_vp,
                 "afección ENP": afeccion_enp, "afección ZEPA": afeccion_zepa,
-                "afección LIC": afeccion_lic, "Afección TM": afeccion_tm,
-                "afección esteparias": afeccion_esteparias,
-                "afección uso_suelo": afeccion_uso_suelo,
-                "afección tortuga": afeccion_tortuga,
-                "afección perdicera": afeccion_perdicera,
-                "afección nutria": afeccion_nutria,
-                "afección fartet": afeccion_fartet,
-                "afección malvasia": afeccion_malvasia,
-                "afección garbancillo": afeccion_garbancillo,
-                "afección flora": afeccion_flora,
+                "afección LIC": afeccion_lic, "afección uso_suelo": afeccion_uso_suelo,
+                "afección corredores": afeccion_corredores,
+                "afección humedales": afeccion_humedales,
+                "afección biosfera": afeccion_biosfera,
+                "afección nitratos": afeccion_nitratos,
                 "coordenadas_x": x, "coordenadas_y": y,
                 "municipio": municipio_sel, "polígono": masa_sel, "parcela": parcela_sel
             }
