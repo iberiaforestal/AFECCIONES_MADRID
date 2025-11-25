@@ -227,33 +227,33 @@ shp_urls = {
 
 # Función para cargar shapefiles desde GitHub
 @st.cache_data
-def cargar_shapefile_desde_github(base_name):
-    base_url = f"https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/CATASTRO/{municipio_name}/"
+def cargar_shapefile_desde_github(municipio_file):
+    base_url = f"https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/CATASTRO/{municipio_file}/"
     exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
     
     with tempfile.TemporaryDirectory() as tmpdir:
         local_paths = {}
         for ext in exts:
-            filename = municipio_name + ext
-            url = base_url + filename
+            url = f"{base_url}{ext}"
             try:
-                response = requests.get(url, timeout=100)
+                response = session.get(url, timeout=60)  # usamos tu session con reintentos
                 response.raise_for_status()
             except requests.exceptions.RequestException as e:
                 st.error(f"Error al descargar {url}: {str(e)}")
                 return None
-            
-            local_path = os.path.join(tmpdir, filename)
+           
+            local_path = os.path.join(tmpdir, municipio_file + ext)
             with open(local_path, "wb") as f:
                 f.write(response.content)
             local_paths[ext] = local_path
-        
+       
         shp_path = local_paths[".shp"]
         try:
-            gdf = gpd.read_file(shp_path)
+            gdf = gpd.read_file(shp_path, encoding="cp1252")
+            gdf = gdf.to_crs(epsg=25830)  # aseguramos ETRS89 UTM 30N
             return gdf
         except Exception as e:
-            st.error(f"Error al leer shapefile {shp_path}: {str(e)}")
+            st.error(f"Error al leer shapefile: {str(e)}")
             return None
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
 def encontrar_municipio_poligono_parcela(x, y):
