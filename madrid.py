@@ -1095,484 +1095,475 @@ def generar_pdf(datos, x, y, filename):
 
     # === TABLA ZEPA === 
     if zepa_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
+
+        # Estimamos altura inicial
         altura_estimada = 5 + 5 + (len(zepa_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
         pdf.cell(0, 5, "Afecciones a Zonas de Especial Protección para las Aves (ZEPA):", ln=True)
         pdf.ln(2)
-        pdf.set_x(pdf.l_margin)
+    
         col_w_code = 30
         col_w_name = 190 - col_w_code
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
         pdf.cell(col_w_code, row_height, "Código", border=1, fill=True)
         pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
         pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for site_code, site_name in zepa_detectado:
-            code_lines = pdf.multi_cell(col_w_code, 5, str(site_code), split_only=True)
-            name_lines = pdf.multi_cell(col_w_name, 5, str(site_name), split_only=True)
-            row_h = max(row_height, len(code_lines) * 5, len(name_lines) * 5)
+    
+        # Bucle con nombres correctos
+        for CD_ZEPA, DS_ZEPA in zepa_detectado:
+    
+            # Calcular líneas necesarias
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(CD_ZEPA), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_ZEPA), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
+    
+            # Dibujar celdas
             pdf.rect(x, y, col_w_code, row_h)
             pdf.rect(x + col_w_code, y, col_w_name, row_h)
-            code_h = len(code_lines) * 5
-            y_code = y + (row_h - code_h) / 2
-            pdf.set_xy(x, y_code)
-            pdf.multi_cell(col_w_code, 5, str(site_code), align="L")
-            name_h = len(name_lines) * 5
-            y_name = y + (row_h - name_h) / 2
-            pdf.set_xy(x + col_w_code, y_name)
-            pdf.multi_cell(col_w_name, 5, str(site_name), align="L")
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(CD_ZEPA), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_ZEPA), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
+    
         pdf.ln(5)
 
     # === TALBA LIC === 
     if lic_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
+    
+        # Estimamos altura inicial
         altura_estimada = 5 + 5 + (len(lic_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afecciones a Lugares de Importancia Comunitaria (LIC):", ln=True)
+        pdf.cell(0, 5, "Afecciones a Lugar de Importancia Comunitaria (LIC):", ln=True)
         pdf.ln(2)
+    
         col_w_code = 30
         col_w_name = 190 - col_w_code
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
         pdf.cell(col_w_code, row_height, "Código", border=1, fill=True)
         pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
         pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for site_code, site_name in lic_detectado:
-            code_lines = pdf.multi_cell(col_w_code, 5, str(site_code), split_only=True)
-            name_lines = pdf.multi_cell(col_w_name, 5, str(site_name), split_only=True)
-            row_h = max(row_height, len(code_lines) * 5, len(name_lines) * 5)
+    
+        # Bucle con nombres correctos
+        for CD_ZEC_CODE, DS_ZEC_NAME in lic_detectado:
+    
+            # Calcular líneas necesarias
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(CD_ZEC_CODE), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_ZEC_NAME), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
+    
+            # Dibujar celdas
             pdf.rect(x, y, col_w_code, row_h)
             pdf.rect(x + col_w_code, y, col_w_name, row_h)
-            code_h = len(code_lines) * 5
-            y_code = y + (row_h - code_h) / 2
-            pdf.set_xy(x, y_code)
-            pdf.multi_cell(col_w_code, 5, str(site_code), align="L")
-            name_h = len(name_lines) * 5
-            y_name = y + (row_h - name_h) / 2
-            pdf.set_xy(x + col_w_code, y_name)
-            pdf.multi_cell(col_w_name, 5, str(site_name), align="L") 
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(CD_ZEC_CODE), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_ZEC_NAME), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
+    
         pdf.ln(5)
         
     # === TABLA ENP === 
     enp_detectado = list(set(tuple(row) for row in enp_detectado))  # ← ELIMINA DUPLICADOS
     if enp_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
+    
+        # Estimamos altura inicial
         altura_estimada = 5 + 5 + (len(enp_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe     
-
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afecciones a Espacios Naturales Protegidos (ENP):", ln=True)
+        pdf.cell(0, 5, "Afecciones a Espacio Natural Protegido (ENP):", ln=True)
         pdf.ln(2)
-
-        # --- ANCHO TOTAL DISPONIBLE ---
-        ancho_total = 190
-        col_widths = [ancho_total * 0.45, ancho_total * 0.55]
+    
+        col_w_code = 30
+        col_w_name = 190 - col_w_code
         line_height = 5
-
-        # --- CABECERA ---
+        row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_widths[0], 5, "Nombre", border=1, fill=True)
-        pdf.cell(col_widths[1], 5, "Figura", border=1, fill=True, ln=True)
-
-        # --- FILAS ---
+        pdf.cell(col_w_code, row_height, "Figura", border=1, fill=True)
+        pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
+        pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for nombre, figura in enp_detectado:
-            nombre = str(nombre)
-            figura = str(figura)
-
+    
+        # Bucle con nombres correctos
+        for DS_FIGURA, DS_NOMBRE in enp_detectado:
+    
             # Calcular líneas necesarias
-            nombre_lines = len(pdf.multi_cell(col_widths[0], line_height, nombre, split_only=True))
-            figura_lines = len(pdf.multi_cell(col_widths[1], line_height, figura, split_only=True))
-            row_height = max(5, nombre_lines * line_height, figura_lines * line_height)
-
-            x = pdf.get_x()
-            y = pdf.get_y()
-
-            # Dibujar bordes
-            pdf.rect(x, y, col_widths[0], row_height)
-            pdf.rect(x + col_widths[0], y, col_widths[1], row_height)
-
-            # Texto centrado verticalmente
-            pdf.set_xy(x, y + (row_height - nombre_lines * line_height) / 2)
-            pdf.multi_cell(col_widths[0], line_height, nombre)
-
-            pdf.set_xy(x + col_widths[0], y + (row_height - figura_lines * line_height) / 2)
-            pdf.multi_cell(col_widths[1], line_height, figura)
-
-            pdf.set_y(y + row_height)
-
-        pdf.ln(5)
-        
-    # === TABLA ESTEPARIAS ===
-    if esteparias_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(esteparias_detectado) * 6) + 10
-        if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
-        pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afecciones a zonas de distribución de aves esteparias:", ln=True)
-        pdf.ln(2)
-
-        col_cuad = 35
-        col_esp  = 50
-        col_nom  = 190 - col_cuad - col_esp
-        line_height = 5
-
-        # --- CABECERA ---
-        pdf.set_font("Arial", "B", 10)
-        pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_cuad, 5, "Cuadrícula", border=1, fill=True)
-        pdf.cell(col_esp,  5, "Especie",     border=1, fill=True)
-        pdf.cell(col_nom,  5, "Nombre común", border=1, fill=True, ln=True)
-
-        # --- FILAS (TODO DENTRO DEL BUCLE) ---
-        pdf.set_font("Arial", "", 10)
-        for cuad, especie, nombre in esteparias_detectado:
-            # 1. Calcular altura de cada celda
-            cuad_l = len(pdf.multi_cell(col_cuad, line_height, str(cuad), split_only=True))
-            esp_l  = len(pdf.multi_cell(col_esp,  line_height, str(especie), split_only=True))
-            nom_l  = len(pdf.multi_cell(col_nom,  line_height, str(nombre), split_only=True))
-            row_h = max(5, cuad_l * line_height, esp_l * line_height, nom_l * line_height)
-
-            # 2. SALTO DE PÁGINA SI NO CABE
-            if pdf.get_y() + row_h > pdf.h - pdf.b_margin:
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(DS_FIGURA), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_NOMBRE), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
                 pdf.add_page()
-
-            # 3. Posición actual
-            x, y = pdf.get_x(), pdf.get_y()
-
-            # 4. Dibujar bordes
-            pdf.rect(x, y, col_cuad, row_h)
-            pdf.rect(x + col_cuad, y, col_esp, row_h)
-            pdf.rect(x + col_cuad + col_esp, y, col_nom, row_h)
-
-            # 5. Escribir texto (centrado verticalmente)
-            pdf.set_xy(x, y + (row_h - cuad_l * line_height) / 2)
-            pdf.multi_cell(col_cuad, line_height, str(cuad))
-
-            pdf.set_xy(x + col_cuad, y + (row_h - esp_l * line_height) / 2)
-            pdf.multi_cell(col_esp, line_height, str(especie))
-
-            pdf.set_xy(x + col_cuad + col_esp, y + (row_h - nom_l * line_height) / 2)
-            pdf.multi_cell(col_nom, line_height, str(nombre))
-
-            # 6. Avanzar a la siguiente fila
-            pdf.set_y(y + row_h)
-
-        pdf.ln(5)  # Espacio final
-
-    # === TABLA TORTUGA ===
-    if tortuga_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(tortuga_detectado) * 6) + 10
-        if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
-        pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación tortuga mora:", ln=True)
-        pdf.ln(2)
-        col_w_cat_id = 50
-        col_w_cat_desc = 190 - col_w_cat_id
-        row_height = 5
-        pdf.set_font("Arial", "B", 10)
-        pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_cat_id, row_height, "Cat_id", border=1, fill=True)
-        pdf.cell(col_w_cat_desc, row_height, "Clasificación", border=1, fill=True)
-        pdf.ln()
-        pdf.set_font("Arial", "", 10)
-        for cat_id, cat_desc in tortuga_detectado:
-            cat_id_lines = pdf.multi_cell(col_w_cat_id, 5, str(cat_id), split_only=True)
-            cat_desc_lines = pdf.multi_cell(col_w_cat_desc, 5, str(cat_desc), split_only=True)
-            row_h = max(row_height, len(cat_id_lines) * 5, len(cat_desc_lines) * 5)
+    
             x = pdf.get_x()
             y = pdf.get_y()
-            pdf.rect(x, y, col_w_cat_id, row_h)
-            pdf.rect(x + col_w_cat_id, y, col_w_cat_desc, row_h)
-            cat_id_h = len(cat_id_lines) * 5
-            y_cat_id = y + (row_h - cat_id_h) / 2
-            pdf.set_xy(x, y_cat_id)
-            pdf.multi_cell(col_w_cat_id, 5, str(cat_id), align="L")
-            cat_desc_h = len(cat_desc_lines) * 5
-            y_cat_desc = y + (row_h - cat_desc_h) / 2
-            pdf.set_xy(x + col_w_cat_id, y_cat_desc)
-            pdf.multi_cell(col_w_cat_desc, 5, str(cat_desc), align="L")
+    
+            # Dibujar celdas
+            pdf.rect(x, y, col_w_code, row_h)
+            pdf.rect(x + col_w_code, y, col_w_name, row_h)
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(DS_FIGURA), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_NOMBRE), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
-        pdf.ln(5)
-        
-    # === TABLA PERDICERA ===
-    if perdicera_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(perdicera_detectado) * 6) + 10
-        if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
-        pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación águila perdicera:", ln=True)
-        pdf.ln(2)
-        col_w_zona = 50
-        col_w_nombre = 190 - col_w_zona
-        row_height = 5
-        pdf.set_font("Arial", "B", 10)
-        pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_zona, row_height, "Zona", border=1, fill=True)
-        pdf.cell(col_w_nombre, row_height, "Nombre", border=1, fill=True)
-        pdf.ln()
-        pdf.set_font("Arial", "", 10)
-        for zona, nombre in perdicera_detectado:
-            zona_lines = pdf.multi_cell(col_w_zona, 5, str(zona), split_only=True)
-            nombre_lines = pdf.multi_cell(col_w_nombre, 5, str(nombre), split_only=True)
-            row_h = max(row_height, len(zona_lines) * 5, len(nombre_lines) * 5)
-            x = pdf.get_x()
-            y = pdf.get_y()
-            pdf.rect(x, y, col_w_zona, row_h)
-            pdf.rect(x + col_w_zona, y, col_w_nombre, row_h)
-            zona_h = len(zona_lines) * 5
-            y_zona = y + (row_h - zona_h) / 2
-            pdf.set_xy(x, y_zona)
-            pdf.multi_cell(col_w_zona, 5, str(zona), align="L")
-            nombre_h = len(nombre_lines) * 5
-            y_nombre = y + (row_h - nombre_h) / 2
-            pdf.set_xy(x + col_w_zona, y_nombre)
-            pdf.multi_cell(col_w_nombre, 5, str(nombre), align="L")
-            pdf.set_y(y + row_h)
+    
         pdf.ln(5)
 
-    # === TABLA NUTRIA ===
-    if nutria_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(nutria_detectado) * 6) + 10
+    # === TABLA CORREDORES === 
+    corredores_detectado = list(set(tuple(row) for row in corredores_detectado))  # ← ELIMINA DUPLICADOS
+    if corredores_detectado:
+    
+        # Estimamos altura inicial
+        altura_estimada = 5 + 5 + (len(corredores_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación nutria:", ln=True)
+        pdf.cell(0, 5, "Afecciones a Corredores Ecológicos:", ln=True)
         pdf.ln(2)
-        col_w_tipo_de_ar = 50
-        col_w_nombre = 190 - col_w_tipo_de_ar
+    
+        col_w_code = 30
+        col_w_name = 190 - col_w_code
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_tipo_de_ar, row_height, "Área", border=1, fill=True)
-        pdf.cell(col_w_nombre, row_height, "Nombre", border=1, fill=True)
+        pdf.cell(col_w_code, row_height, "Tipo", border=1, fill=True)
+        pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
         pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for tipo_de_ar, nombre in nutria_detectado:
-            tipo_de_ar_lines = pdf.multi_cell(col_w_tipo_de_ar, 5, str(tipo_de_ar), split_only=True)
-            nombre_lines = pdf.multi_cell(col_w_nombre, 5, str(nombre), split_only=True)
-            row_h = max(row_height, len(tipo_de_ar_lines) * 5, len(nombre_lines) * 5)
+    
+        # Bucle con nombres correctos
+        for DS_TIPO_CORREDOR, DS_NOMCORREDOR in corredores_detectado:
+    
+            # Calcular líneas necesarias
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(DS_TIPO_CORREDOR), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_NOMCORREDOR), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
-            pdf.rect(x, y, col_w_tipo_de_ar, row_h)
-            pdf.rect(x + col_w_tipo_de_ar, y, col_w_nombre, row_h)
-            tipo_de_ar_h = len(tipo_de_ar_lines) * 5
-            y_tipo_de_ar = y + (row_h - tipo_de_ar_h) / 2
-            pdf.set_xy(x, y_tipo_de_ar)
-            pdf.multi_cell(col_w_tipo_de_ar, 5, str(tipo_de_ar), align="L")
-            nombre_h = len(nombre_lines) * 5
-            y_nombre = y + (row_h - nombre_h) / 2
-            pdf.set_xy(x + col_w_tipo_de_ar, y_nombre)
-            pdf.multi_cell(col_w_nombre, 5, str(nombre), align="L")
+    
+            # Dibujar celdas
+            pdf.rect(x, y, col_w_code, row_h)
+            pdf.rect(x + col_w_code, y, col_w_name, row_h)
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(DS_TIPO_CORREDOR), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_NOMCORREDOR), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
+    
         pdf.ln(5)
 
-    # === TABLA FARTET ===
-    if fartet_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(fartet_detectado) * 6) + 10
+    # === TABLA HUMEDALES === 
+    humedales_detectado = list(set(tuple(row) for row in humedales_detectado))  # ← ELIMINA DUPLICADOS
+    if humedales_detectado:
+    
+        # Estimamos altura inicial
+        altura_estimada = 5 + 5 + (len(humedales_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación fartet:", ln=True)
+        pdf.cell(0, 5, "Afecciones a Humedales:", ln=True)
         pdf.ln(2)
-        col_w_clasificac = 50
-        col_w_nombre = 190 - col_w_clasificac
+    
+        col_w_code = 30
+        col_w_name = 190 - col_w_code
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_clasificac, row_height, "Área", border=1, fill=True)
-        pdf.cell(col_w_nombre, row_height, "Nombre", border=1, fill=True)
+        pdf.cell(col_w_code, row_height, "Zona", border=1, fill=True)
+        pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
         pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for clasificac, nombre in fartet_detectado:
-            clasificac_lines = pdf.multi_cell(col_w_clasificac, 5, str(clasificac), split_only=True)
-            nombre_lines = pdf.multi_cell(col_w_nombre, 5, str(nombre), split_only=True)
-            row_h = max(row_height, len(clasificac_lines) * 5, len(nombre_lines) * 5)
+    
+        # Bucle con nombres correctos
+        for DS_ZONA, DS_HUMEDAL in humedales_detectado:
+    
+            # Calcular líneas necesarias
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(DS_ZONA), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_HUMEDAL), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
-            pdf.rect(x, y, col_w_clasificac, row_h)
-            pdf.rect(x + col_w_clasificac, y, col_w_nombre, row_h)
-            clasificac_h = len(clasificac_lines) * 5
-            y_clasificac = y + (row_h - clasificac_h) / 2
-            pdf.set_xy(x, y_clasificac)
-            pdf.multi_cell(col_w_clasificac, 5, str(clasificac), align="L")
-            nombre_h = len(nombre_lines) * 5
-            y_nombre = y + (row_h - nombre_h) / 2
-            pdf.set_xy(x + col_w_clasificac, y_nombre)
-            pdf.multi_cell(col_w_nombre, 5, str(nombre), align="L")
+    
+            # Dibujar celdas
+            pdf.rect(x, y, col_w_code, row_h)
+            pdf.rect(x + col_w_code, y, col_w_name, row_h)
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(DS_ZONA), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_HUMEDAL), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
+    
         pdf.ln(5)
 
-    # === TABLA MALVASIA ===
-    if malvasia_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(malvasia_detectado) * 6) + 10
+    # === TABLA BIOSFERA === 
+    biosfera_detectado = list(set(tuple(row) for row in biosfera_detectado))  # ← ELIMINA DUPLICADOS
+    if biosfera_detectado:
+    
+        # Estimamos altura inicial
+        altura_estimada = 5 + 5 + (len(biosfera_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación malvasia:", ln=True)
+        pdf.cell(0, 5, "Afecciones a Reserva de la Biosfera:", ln=True)
         pdf.ln(2)
-        col_w_clasificac = 50
-        col_w_nombre = 190 - col_w_clasificac
+    
+        col_w_code = 30
+        col_w_name = 190 - col_w_code
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_clasificac, row_height, "Área", border=1, fill=True)
-        pdf.cell(col_w_nombre, row_height, "Nombre", border=1, fill=True)
+        pdf.cell(col_w_code, row_height, "Zona", border=1, fill=True)
+        pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
         pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for clasificac, nombre in malvasia_detectado:
-            clasificac_lines = pdf.multi_cell(col_w_clasificac, 5, str(clasificac), split_only=True)
-            nombre_lines = pdf.multi_cell(col_w_nombre, 5, str(nombre), split_only=True)
-            row_h = max(row_height, len(clasificac_lines) * 5, len(nombre_lines) * 5)
+    
+        # Bucle con nombres correctos
+        for CD_RESERVA, DS_RESERVA in biosfera_detectado:
+    
+            # Calcular líneas necesarias
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(CD_RESERVA), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_RESERVA), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
-            pdf.rect(x, y, col_w_clasificac, row_h)
-            pdf.rect(x + col_w_clasificac, y, col_w_nombre, row_h)
-            clasificac_h = len(clasificac_lines) * 5
-            y_clasificac = y + (row_h - clasificac_h) / 2
-            pdf.set_xy(x, y_clasificac)
-            pdf.multi_cell(col_w_clasificac, 5, str(clasificac), align="L")
-            nombre_h = len(nombre_lines) * 5
-            y_nombre = y + (row_h - nombre_h) / 2
-            pdf.set_xy(x + col_w_clasificac, y_nombre)
-            pdf.multi_cell(col_w_nombre, 5, str(nombre), align="L")
+    
+            # Dibujar celdas
+            pdf.rect(x, y, col_w_code, row_h)
+            pdf.rect(x + col_w_code, y, col_w_name, row_h)
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(CD_RESERVA), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_RESERVA), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
-        pdf.ln(5)
-
-    # === TABLA GARBANCILLO ===
-    if garbancillo_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(garbancillo_detectado) * 6) + 10
+    
+        pdf.ln(5)    
+           
+    # === TABLA NITRATOS === 
+    nitratos_detectado = list(set(tuple(row) for row in nitratos_detectado))  # ← ELIMINA DUPLICADOS
+    if nitratos_detectado:
+    
+        # Estimamos altura inicial
+        altura_estimada = 5 + 5 + (len(nitratos_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación garbancillo:", ln=True)
+        pdf.cell(0, 5, "Afecciones a Zonas con Contaminación de Nitratos:", ln=True)
         pdf.ln(2)
-        col_w_tipo = 50
-        col_w_nombre = 190 - col_w_tipo
+    
+        col_w_code = 30
+        col_w_name = 190 - col_w_code
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_tipo, row_height, "Área", border=1, fill=True)
-        pdf.cell(col_w_nombre, row_height, "Nombre", border=1, fill=True)
+        pdf.cell(col_w_code, row_height, "Zona", border=1, fill=True)
+        pdf.cell(col_w_name, row_height, "Nombre", border=1, fill=True)
         pdf.ln()
+    
         pdf.set_font("Arial", "", 10)
-        for tipo, nombre in garbancillo_detectado:
-            tipo_lines = pdf.multi_cell(col_w_tipo, 5, str(tipo), split_only=True)
-            nombre_lines = pdf.multi_cell(col_w_nombre, 5, str(nombre), split_only=True)
-            row_h = max(row_height, len(tipo_lines) * 5, len(nombre_lines) * 5)
+    
+        # Bucle con nombres correctos
+        for CD_ZONA, DS_DESCRIPCIO in nitratos_detectado:
+    
+            # Calcular líneas necesarias
+            code_lines = pdf.multi_cell(col_w_code, line_height, str(CD_ZONA), split_only=True) or [""]
+            name_lines = pdf.multi_cell(col_w_name, line_height, str(DS_DESCRIPCIO), split_only=True) or [""]
+    
+            # Altura real
+            row_h = max(
+                row_height,
+                len(code_lines) * line_height,
+                len(name_lines) * line_height
+            )
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
-            pdf.rect(x, y, col_w_tipo, row_h)
-            pdf.rect(x + col_w_tipo, y, col_w_nombre, row_h)
-            tipo_h = len(tipo_lines) * 5
-            y_tipo = y + (row_h - tipo_h) / 2
-            pdf.set_xy(x, y_tipo)
-            pdf.multi_cell(col_w_tipo, 5, str(tipo), align="L")
-            nombre_h = len(nombre_lines) * 5
-            y_nombre = y + (row_h - nombre_h) / 2
-            pdf.set_xy(x + col_w_tipo, y_nombre)
-            pdf.multi_cell(col_w_nombre, 5, str(nombre), align="L")
+    
+            # Dibujar celdas
+            pdf.rect(x, y, col_w_code, row_h)
+            pdf.rect(x + col_w_code, y, col_w_name, row_h)
+    
+            # Escribir código 
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_w_code, line_height, str(CD_ZONA), align="L")
+    
+            # Escribir nombre 
+            pdf.set_xy(x + col_w_code, y)
+            pdf.multi_cell(col_w_name, line_height, str(DS_DESCRIPCIO), align="L")
+    
+            # Mover a la siguiente fila
             pdf.set_y(y + row_h)
-        pdf.ln(5)
-        
-    # === TABLA FLORA ===
-    if flora_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
-        altura_estimada = 5 + 5 + (len(flora_detectado) * 6) + 10
-        if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
-        pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afección a Plan de Recuperación flora:", ln=True)
-        pdf.ln(2)
-        col_w_tipo = 50
-        col_w_nombre = 190 - col_w_tipo
-        row_height = 5
-        pdf.set_font("Arial", "B", 10)
-        pdf.set_fill_color(*azul_rgb)
-        pdf.cell(col_w_tipo, row_height, "Área", border=1, fill=True)
-        pdf.cell(col_w_nombre, row_height, "Nombre", border=1, fill=True)
-        pdf.ln()
-        pdf.set_font("Arial", "", 10)
-        for tipo, nombre in flora_detectado:
-            tipo_lines = pdf.multi_cell(col_w_tipo, 5, str(tipo), split_only=True)
-            nombre_lines = pdf.multi_cell(col_w_nombre, 5, str(nombre), split_only=True)
-            row_h = max(row_height, len(tipo_lines) * 5, len(nombre_lines) * 5)
-            x = pdf.get_x()
-            y = pdf.get_y()
-            pdf.rect(x, y, col_w_tipo, row_h)
-            pdf.rect(x + col_w_tipo, y, col_w_nombre, row_h)
-            tipo_h = len(tipo_lines) * 5
-            y_tipo = y + (row_h - tipo_h) / 2
-            pdf.set_xy(x, y_tipo)
-            pdf.multi_cell(col_w_tipo, 5, str(tipo), align="L")
-            nombre_h = len(nombre_lines) * 5
-            y_nombre = y + (row_h - nombre_h) / 2
-            pdf.set_xy(x + col_w_tipo, y_nombre)
-            pdf.multi_cell(col_w_nombre, 5, str(nombre), align="L") 
-            pdf.set_y(y + row_h)
-        pdf.ln(5)        
-          
+    
+        pdf.ln(5)   
+         
     # Nueva sección para el texto en cuadro
     # Procedimientos sin negrita
     pdf.set_font("Arial", "", 8)  # Fuente normal para los procedimientos
     procedimientos_con_enlace = [
-        ("1609", "Solicitudes, escritos y comunicaciones que no disponen de un procedimiento específico en la Guía de Procedimientos y Servicios.", "https://sede.carm.es/web/pagina?IDCONTENIDO=1609&IDTIPO=240&RASTRO=c$m40288"),
-        ("1802", "Emisión de certificación sobre delimitación vías pecuarias con respecto a fincas particulares para inscripción registral.", "https://sede.carm.es/web/pagina?IDCONTENIDO=1802&IDTIPO=240&RASTRO=c$m40288"),
-        ("3482", "Emisión de Informe en el ejercicio de los derechos de adquisición preferente (tanteo y retracto) en transmisiones fincas forestales.", None),
-        ("3483", "Autorización de proyectos o actuaciones materiales en dominio público forestal que no conlleven concesión administrativa.", "https://sede.carm.es/web/pagina?IDCONTENIDO=3483&IDTIPO=240&RASTRO=c$m40288"),
-        ("3485", "Deslinde y amojonamiento de montes a instancia de parte.", "https://sede.carm.es/web/pagina?IDCONTENIDO=3485&IDTIPO=240&RASTRO=c$m40288"),
-        ("3487", "Clasificación, deslinde, desafectación y amojonamiento de vías pecuarias.", "https://sede.carm.es/web/pagina?IDCONTENIDO=3487&IDTIPO=240&RASTRO=c$m40293"),
-        ("3488", "Emisión de certificaciones de colindancia de fincas particulares respecto a montes incluidos en el Catálogo de Utilidad Pública.", "https://sede.carm.es/web/pagina?IDCONTENIDO=3488&IDTIPO=240&RASTRO=c$m40293"),
-        ("3489", "Autorizaciones en dominio público pecuario sin uso privativo.", "https://sede.carm.es/web/pagina?IDCONTENIDO=3489&IDTIPO=240&RASTRO=c$m40288"),
-        ("3490", "Emisión de certificación o informe de colindancia de finca particular respecto de vía pecuaria.", "https://sede.carm.es/web/pagina?IDCONTENIDO=3490&IDTIPO=240&RASTRO=c$m40288"),
-        ("5883", "(INM) Emisión de certificación o informe para inmatriculación o inscripción registral de fincas colindantes con monte incluido en el CUP.", "https://sede.carm.es/web/pagina?IDCONTENIDO=5883&IDTIPO=240&RASTRO=c$m40288"),
-        ("482", "Autorizaciones e informes en Espacios Naturales Protegidos y Red Natura 2000 de la Región de Murcia.", "https://sede.carm.es/web/pagina?IDCONTENIDO=482&IDTIPO=240&RASTRO=c$m40288"),
-        ("7186", "Ocupación renovable de carácter temporal de vías pecuarias con concesión demanial.", None),
-        ("7202", "Modificación de trazados en vías pecuarias.", "https://sede.carm.es/web/pagina?IDCONTENIDO=7202&IDTIPO=240&RASTRO=c$m40288"),
-        ("7222", "Concesión para la utilización privativa y aprovechamiento especial del dominio público.", None),
-        ("7242", "Autorización de permutas en montes públicos.", "https://sede.carm.es/web/pagina?IDCONTENIDO=7242&IDTIPO=240&RASTRO=c$m40288"),
+        ("70090", "Presentación de escritos y comunicaciones. Formulario genérico.", "https://sede.comunidad.madrid/prestacion-social/formulario-solicitud-generica"),        
+        ("L209", "Concesiones para usos privativos en montes de utilidad pública.", "https://sede.comunidad.madrid/autorizaciones-licencias-permisos-carnes/concesion-uso-privativo-montes-up"),
+        ("24859", "Autorización de aprovechamiento de madera y leña en montes no gestionados por la Comunidad de Madrid.", "https://sede.comunidad.madrid/autorizaciones-licencias-permisos-carnes/autorizacion-aprov-montes-no-gestionados"),
+        ("L250", "Autorización de cambio de uso forestal a agrícola.", "https://sede.comunidad.madrid/autorizaciones-licencias-permisos-carnes/cambio-uso-forestal-agricola-0"),
+        ("L221", "Informe sectorial en materia de biodiversidad y gestión forestal.", "https://sede.comunidad.madrid/autorizaciones-licencias-permisos-carnes/informe-sectorial-biodiversidad"),
+        ("2468", "Autorizaciones e informes para actividades en el medio natural o espacios protegidos.", "https://sede.comunidad.madrid/autorizaciones-licencias-permisos-carnes/autorizacion-actividades-medio-natural"),
+        ("89970", "Autorizaciones para actividades en el Parque Nacional de la Sierra de Guadarrama.", "https://sede.comunidad.madrid/autorizaciones-licencias-permisos-carnes/autorizacion-p-n-sierra-guadarrama"),
     ]
 
     texto_rojo = (
-        "Este borrador preliminar de afecciones no tiene el valor de una certificación oficial y por tanto carece de validez legal y solo sirve como información general con carácter orientativo."
+        "Este informe se emite a efectos ambientales, sin perjuicio de terceros, no prejuzga derechos de propiedad y se habrán de obtener cuantas autorizaciones, licencias o permisos sean preceptivos conforme a la Ley."
     )
     texto_resto = (
-        "En caso de ser detectadas afecciones a Dominio público forestal o pecuario, así como a Espacios Naturales Protegidos o RN2000, debe solicitar informe oficial a la D. G. de Patrimonio Natural y Acción Climática, a través de los procedimientos establecidos en sede electrónica:\n"
+        "En caso de ser detectadas afecciones a Dominio público forestal o pecuario, así como a Espacios Naturales Protegidos o RN2000, debe solicitar informe oficial a la Dirección General de Biodiversidad y Gestión Forestal, a través de los procedimientos establecidos en sede electrónica:\n"
     )
 
     # === 1. CALCULAR ALTURA TOTAL ANTES DE DIBUJAR NADA ===
