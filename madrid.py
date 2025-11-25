@@ -828,24 +828,16 @@ def generar_pdf(datos, x, y, filename):
             otras_afecciones.append((key_corregido, valor if valor else "No afecta"))
 
     # Solo incluir en "otras afecciones" si NO tienen detecciones
-    if not flora_detectado:
-        otras_afecciones.append(("Afección a flora", flora_valor if flora_valor else "No afecta a Plan de Recuperación de flora"))
-    if not garbancillo_detectado:
-        otras_afecciones.append(("Afección a garbancillo", garbancillo_valor if garbancillo_valor else "No afecta a Plan de Recuperación del garbancillo"))
-    if not malvasia_detectado:
-        otras_afecciones.append(("Afección a malvasia", malvasia_valor if malvasia_valor else "No afecta a Plan de Recuperación de la malvasia"))
-    if not fartet_detectado:
-        otras_afecciones.append(("Afección a fartet", fartet_valor if fartet_valor else "No afecta a Plan de Recuperación del fartet"))
-    if not nutria_detectado:
-        otras_afecciones.append(("Afección a nutria", nutria_valor if nutria_valor else "No afecta a Plan de Recuperación de la nutria"))
-    if not perdicera_detectado:
-        otras_afecciones.append(("Afección a águila perdicera", perdicera_valor if perdicera_valor else "No afecta a Plan de Recuperación águila perdicera"))
-    if not tortuga_detectado:
-        otras_afecciones.append(("Afección a tortuga mora", tortuga_valor if tortuga_valor else "No afecta a Plan de Recuperación tortuga mora"))
+    if not nitratos_detectado:
+        otras_afecciones.append(("Afección a nitratos", nitratos_valor if nitratos_valor else "No afecta a Contaminación por Nitratos"))
+    if not biosfera_detectado:
+        otras_afecciones.append(("Afección a Reserva de la Biosfera", biosfera_valor if biosfera_valor else "No afecta a Reserva de la Biosfera"))
+    if not humedales_detectado:
+        otras_afecciones.append(("Afección a humedales", humedales_valor if humedales_valor else "No afecta a Humedales"))
     if not uso_suelo_detectado:
         otras_afecciones.append(("Afección Uso del Suelo", uso_suelo_valor if uso_suelo_valor else "No afecta a ningún uso del suelo protegido"))
-    if not esteparias_detectado:
-        otras_afecciones.append(("Afección Esteparias", esteparias_valor if esteparias_valor else "No se encuentra en zona de distribución de aves esteparias"))
+    if not corredores_detectado:
+        otras_afecciones.append(("Afección Corredores Ecológicos", corredores_valor if corredores_valor else "No afecta a Corredores Ecológicos"))
     if not enp_detectado:
         otras_afecciones.append(("Afección ENP", enp_valor if enp_valor else "No se encuentra en ningún ENP"))
     if not lic_detectado:
@@ -856,7 +848,7 @@ def generar_pdf(datos, x, y, filename):
         otras_afecciones.append(("Afección VP", vp_valor if vp_valor else "No afecta a ninguna VP"))
     if not mup_detectado:
         otras_afecciones.append(("Afección MUP", mup_valor if mup_valor else "No afecta a ningún MUP"))
-
+   
     # Mostrar otras afecciones con títulos en negrita    
     if otras_afecciones:
         pdf.set_font("Arial", "B", 11)
@@ -887,202 +879,219 @@ def generar_pdf(datos, x, y, filename):
 
     # === TABLA USO DEL SUELO ===    
     if uso_suelo_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
+    
+        # Estimamos altura inicial
         altura_estimada = 5 + 5 + (len(uso_suelo_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-            
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
         pdf.cell(0, 5, "Afección a Planeamiento Urbano (PGOU):", ln=True)
         pdf.ln(2)
+    
         col_w_uso = 50
         col_w_clas = 190 - col_w_uso
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 11)
         pdf.set_fill_color(*azul_rgb)
         pdf.cell(col_w_uso, row_height, "Uso", border=1, fill=True)
         pdf.cell(col_w_clas, row_height, "Clasificación", border=1, fill=True)
         pdf.ln()
+    
+        # Filas
         pdf.set_font("Arial", "", 10)
-        for Uso_Especifico, Clasificacion in uso_suelo_detectado:
-            uso_lines = pdf.multi_cell(col_w_uso, 5, str(Uso_Especifico), split_only=True)
-            clas_lines = pdf.multi_cell(col_w_clas, 5, str(Clasificacion), split_only=True)
-            row_h = max(row_height, len(uso_lines) * 5, len(clas_lines) * 5)
+    
+        for DS_CALI, DS_CLASI in uso_suelo_detectado:
+    
+            # Calcular número de líneas (sin imprimir)
+            uso_lines = pdf.multi_cell(col_w_uso, line_height, str(DS_CALI), split_only=True) or [""]
+            clas_lines = pdf.multi_cell(col_w_clas, line_height, str(DS_CLASI), split_only=True) or [""]
+    
+            # Altura real de fila
+            row_h = max(row_height, len(uso_lines)*line_height, len(clas_lines)*line_height)
+    
+            # ⇩ Evitar salto de página a mitad de fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
+    
+            # Dibujar celdas
             pdf.rect(x, y, col_w_uso, row_h)
             pdf.rect(x + col_w_uso, y, col_w_clas, row_h)
-            uso_h = len(uso_lines) * 5
-            y_uso = y + (row_h - uso_h) / 2
-            pdf.set_xy(x, y_uso)
-            pdf.multi_cell(col_w_uso, 5, str(Uso_Especifico), align="L")
-            clas_h = len(clas_lines) * 5
-            y_clas = y + (row_h - clas_h) / 2
-            pdf.set_xy(x + col_w_uso, y_clas)
-            pdf.multi_cell(col_w_clas, 5, str(Clasificacion), align="L")
+    
+            # ---- Uso ----
+            uso_h = len(uso_lines) * line_height
+            pdf.set_xy(x, y)  # sin centrado vertical para evitar desalineación en multilínea
+            pdf.multi_cell(col_w_uso, line_height, str(DS_CALI), align="L")
+    
+            # ---- Clasificación ----
+            pdf.set_xy(x + col_w_uso, y)
+            pdf.multi_cell(col_w_clas, line_height, str(DS_CLASI), align="L")
+    
+            # Siguiente fila
             pdf.set_y(y + row_h)
+    
         pdf.ln(5)
         
     # === TABLA VP ===
     if vp_detectado:
+    
         # Estimamos altura: título + cabecera + filas + espacio
         altura_estimada = 5 + 5 + (len(vp_detectado) * 6) + 10
+    
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
         pdf.cell(0, 5, "Afecciones a Vías Pecuarias (VP):", ln=True)
         pdf.ln(2)
-
-        # Configurar la tabla para VP
-        col_widths = [30, 50, 40, 40, 30]  # Anchos: Código, Nombre, Municipio, Situación Legal, Ancho Legal
+    
+        # Configurar tabla
+        col_widths = [30, 70, 60, 30]  # Código, Nombre, Municipio, Tipo
+        line_height = 5
         row_height = 5
+    
+        # Cabecera
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
         pdf.cell(col_widths[0], row_height, "Código", border=1, fill=True)
         pdf.cell(col_widths[1], row_height, "Nombre", border=1, fill=True)
         pdf.cell(col_widths[2], row_height, "Municipio", border=1, fill=True)
-        pdf.cell(col_widths[3], row_height, "Situación Legal", border=1, fill=True)
-        pdf.cell(col_widths[4], row_height, "Ancho Legal", border=1, fill=True)
+        pdf.cell(col_widths[3], row_height, "Tipo", border=1, fill=True)
         pdf.ln()
-
-        # Agregar filas a la tabla
+    
         pdf.set_font("Arial", "", 10)
-
-        for codigo_vp, nombre, municipio, situacion_legal, ancho_legal in vp_detectado:
-
-            line_height = 5  # altura base de una línea
-
-            # Obtener altura necesaria para columnas multilínea
-            nombre_lines = pdf.multi_cell(col_widths[1], line_height, str(nombre), split_only=True)
-            if not nombre_lines:
-                nombre_lines = [""]  # evitar None
-            nombre_height = len(nombre_lines) * line_height
-
-            # Situación legal
-            sit_leg_lines = pdf.multi_cell(col_widths[3], line_height, str(situacion_legal), split_only=True)
-            if not sit_leg_lines:
-                sit_leg_lines = [""]  # evitar None
-            sit_leg_height = len(sit_leg_lines) * line_height
-
-            # Altura real de la fila
-            row_h = max(row_height, nombre_height, sit_leg_height)    
-
-            # Guardar posición actual
+    
+        for CD_VP, DS_NOMBRE, DS_MUNI, DS_TIPO in vp_detectado:
+    
+            # Calcular alturas reales por multilínea
+            nombre_lines = pdf.multi_cell(col_widths[1], line_height, str(DS_NOMBRE), split_only=True) or [""]
+            muni_lines = pdf.multi_cell(col_widths[2], line_height, str(DS_MUNI), split_only=True) or [""]
+    
+            row_h = max(row_height, len(nombre_lines)*line_height, len(muni_lines)*line_height)
+    
+            # ⇩ NUEVO: Evitar saltos de página a mitad de fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
+            # Guardar posición
             x = pdf.get_x()
             y = pdf.get_y()
-
-            # --- 1) DIBUJAR LA FILA (EL MARCO COMPLETO) ---
+    
+            # Dibujar rectángulos
             pdf.rect(x, y, col_widths[0], row_h)
             pdf.rect(x + col_widths[0], y, col_widths[1], row_h)
             pdf.rect(x + col_widths[0] + col_widths[1], y, col_widths[2], row_h)
             pdf.rect(x + col_widths[0] + col_widths[1] + col_widths[2], y, col_widths[3], row_h)
-            pdf.rect(x + col_widths[0] + col_widths[1] + col_widths[2] + col_widths[3], y, col_widths[4], row_h)
-
-            # --- 2) ESCRIBIR EL TEXTO DENTRO DE LAS CELDAS ---
+    
             # Código
             pdf.set_xy(x, y)
-            pdf.multi_cell(col_widths[0], line_height, str(codigo_vp), align="L")
-
-            # Nombre (multilínea)
+            pdf.multi_cell(col_widths[0], line_height, str(CD_VP), align="L")
+    
+            # Nombre
             pdf.set_xy(x + col_widths[0], y)
-            pdf.multi_cell(col_widths[1], line_height, str(nombre), align="L")
-
+            pdf.multi_cell(col_widths[1], line_height, str(DS_NOMBRE), align="L")
+    
             # Municipio
             pdf.set_xy(x + col_widths[0] + col_widths[1], y)
-            pdf.multi_cell(col_widths[2], line_height, str(municipio), align="L")
-
-            # Situación legal (multilínea)
+            pdf.multi_cell(col_widths[2], line_height, str(DS_MUNI), align="L")
+    
+            # Tipo
             pdf.set_xy(x + col_widths[0] + col_widths[1] + col_widths[2], y)
-            pdf.multi_cell(col_widths[3], line_height, str(situacion_legal), align="L")
-
-            # Ancho legal
-            pdf.set_xy(x + col_widths[0] + col_widths[1] + col_widths[2] + col_widths[3], y)
-            pdf.multi_cell(col_widths[4], line_height, str(ancho_legal), align="L")
-
-            # Mover a la siguiente fila
+            pdf.multi_cell(col_widths[3], line_height, str(DS_TIPO), align="L")
+    
+            # Siguiente fila
             pdf.set_xy(x, y + row_h)
-
-        pdf.ln(5)  # Espacio adicional después de la tabla
+    
+        pdf.ln(5)
 
     # === TABLA MUP === 
     if mup_detectado:
-        # Estimamos altura: título + cabecera + filas + espacio
+    
+        # Estimamos altura inicial
         altura_estimada = 5 + 5 + (len(mup_detectado) * 6) + 10
         if not hay_espacio_suficiente(pdf, altura_estimada):
-            pdf.add_page()  # Salta a nueva página si no cabe
-        
+            pdf.add_page()
+    
         pdf.set_font("Arial", "B", 11)
         pdf.cell(0, 5, "Afecciones a Montes (MUP):", ln=True)
         pdf.ln(2)
-
-        # Configurar la tabla para MUP
+    
+        # Configurar la tabla MUP
         line_height = 5
         col_widths = [30, 80, 40, 40]
         row_height = 5
+    
         pdf.set_font("Arial", "B", 10)
         pdf.set_fill_color(*azul_rgb)
-        
+    
         # Cabecera
         pdf.cell(col_widths[0], 5, "ID", border=1, fill=True)
         pdf.cell(col_widths[1], 5, "Nombre", border=1, fill=True)
         pdf.cell(col_widths[2], 5, "Municipio", border=1, fill=True)
         pdf.cell(col_widths[3], 5, "Propiedad", border=1, fill=True)
         pdf.ln()
-
+    
         # Filas
         pdf.set_font("Arial", "", 10)
-        for id_monte, nombre, municipio, propiedad in mup_detectado:
+    
+        for CD_UP, DS_NOMBRE, DS_MUNICIPIO, DS_PROPIETARIO in mup_detectado:
+    
             # Calcular líneas necesarias por columna
-            id_lines = pdf.multi_cell(col_widths[0], line_height, str(id_monte), split_only=True) or [""]
-            nombre_lines = pdf.multi_cell(col_widths[1], line_height, str(nombre), split_only=True) or [""]
-            mun_lines = pdf.multi_cell(col_widths[2], line_height, str(municipio), split_only=True) or [""]
-            prop_lines = pdf.multi_cell(col_widths[3], line_height, str(propiedad), split_only=True) or [""]
-
-            # Altura de fila = máximo de líneas * line_height
+            id_lines   = pdf.multi_cell(col_widths[0], line_height, str(CD_UP), split_only=True) or [""]
+            nombre_lines = pdf.multi_cell(col_widths[1], line_height, str(DS_NOMBRE), split_only=True) or [""]
+            mun_lines  = pdf.multi_cell(col_widths[2], line_height, str(DS_MUNICIPIO), split_only=True) or [""]
+            prop_lines = pdf.multi_cell(col_widths[3], line_height, str(DS_PROPIETARIO), split_only=True) or [""]
+    
+            # Altura real de fila
             row_h = max(
-                5,
+                row_height,
                 len(id_lines) * line_height,
                 len(nombre_lines) * line_height,
                 len(mun_lines) * line_height,
                 len(prop_lines) * line_height
             )
-
-            # Guardar posición
+    
+            # ⇩ Evitar salto de página dentro de la fila
+            if not hay_espacio_suficiente(pdf, row_h):
+                pdf.add_page()
+    
             x = pdf.get_x()
             y = pdf.get_y()
-
-            # Dibujar bordes de celdas
+    
+            # Dibujar bordes
             pdf.rect(x, y, col_widths[0], row_h)
             pdf.rect(x + col_widths[0], y, col_widths[1], row_h)
             pdf.rect(x + col_widths[0] + col_widths[1], y, col_widths[2], row_h)
             pdf.rect(x + col_widths[0] + col_widths[1] + col_widths[2], y, col_widths[3], row_h)
-
-            # Escribir contenido centrado verticalmente
+    
+            # ---- Escribir contenido (sin centrado vertical, para multilínea correcto) ----
+    
             # ID
-            id_h = len(id_lines) * line_height
-            pdf.set_xy(x, y + (row_h - id_h) / 2)
-            pdf.multi_cell(col_widths[0], line_height, str(id_monte), align="L")
-
+            pdf.set_xy(x, y)
+            pdf.multi_cell(col_widths[0], line_height, str(CD_UP), align="L")
+    
             # Nombre
-            nombre_h = len(nombre_lines) * line_height
-            pdf.set_xy(x + col_widths[0], y + (row_h - nombre_h) / 2)
-            pdf.multi_cell(col_widths[1], line_height, str(nombre), align="L")
-
+            pdf.set_xy(x + col_widths[0], y)
+            pdf.multi_cell(col_widths[1], line_height, str(DS_NOMBRE), align="L")
+    
             # Municipio
-            mun_h = len(mun_lines) * line_height
-            pdf.set_xy(x + col_widths[0] + col_widths[1], y + (row_h - mun_h) / 2)
-            pdf.multi_cell(col_widths[2], line_height, str(municipio), align="L")
-
+            pdf.set_xy(x + col_widths[0] + col_widths[1], y)
+            pdf.multi_cell(col_widths[2], line_height, str(DS_MUNICIPIO), align="L")
+    
             # Propiedad
-            prop_h = len(prop_lines) * line_height
-            pdf.set_xy(x + col_widths[0] + col_widths[1] + col_widths[2], y + (row_h - prop_h) / 2)
-            pdf.multi_cell(col_widths[3], line_height, str(propiedad), align="L")
-
-            # Mover a siguiente fila
+            pdf.set_xy(x + col_widths[0] + col_widths[1] + col_widths[2], y)
+            pdf.multi_cell(col_widths[3], line_height, str(DS_PROPIETARIO), align="L")
+    
+            # Siguiente fila
             pdf.set_y(y + row_h)
-
-        pdf.ln(5)  # Espacio después de la tabla
+    
+        pdf.ln(5)
 
     # === TABLA ZEPA === 
     if zepa_detectado:
