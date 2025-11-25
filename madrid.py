@@ -20,6 +20,19 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import shutil
 from PIL import Image
+def normalize_name(name):
+    # Mantener espacios intactos
+    name = name.upper()\
+               .replace("Á", "A")\
+               .replace("É", "E")\
+               .replace("Í", "I")\
+               .replace("Ó", "O")\
+               .replace("Ú", "U")\
+               .replace("Ü", "U")\
+               .replace("º", "")\
+               .replace("ª", "")
+
+    return name.strip()
 
 # Sesión segura con reintentos
 session = requests.Session()
@@ -30,57 +43,192 @@ session.mount('https://', adapter)
 
 # Diccionario con los nombres de municipios y sus nombres base de archivo
 shp_urls = {
-    "ABANILLA": "ABANILLA",
-    "ABARAN": "ABARAN",
-    "AGUILAS": "AGUILAS",
-    "ALBUDEITE": "ALBUDEITE",
-    "ALCANTARILLA": "ALCANTARILLA",
-    "ALEDO": "ALEDO",
-    "ALGUAZAS": "ALGUAZAS",
-    "ALHAMA DE MURCIA": "ALHAMA_DE_MURCIA",
-    "ARCHENA": "ARCHENA",
-    "BENIEL": "BENIEL",
-    "BLANCA": "BLANCA",
-    "BULLAS": "BULLAS",
-    "CALASPARRA": "CALASPARRA",
-    "CAMPOS DEL RIO": "CAMPOS_DEL_RIO",
-    "CARAVACA DE LA CRUZ": "CARAVACA_DE_LA_CRUZ",
-    "CARTAGENA": "CARTAGENA",
-    "CEHEGIN": "CEHEGIN",
-    "CEUTI": "CEUTI",
-    "CIEZA": "CIEZA",
-    "FORTUNA": "FORTUNA",
-    "FUENTE ALAMO DE MURCIA": "FUENTE_ALAMO_DE_MURCIA",
-    "JUMILLA": "JUMILLA",
-    "LAS TORRES DE COTILLAS": "LAS_TORRES_DE_COTILLAS",
-    "LA UNION": "LA_UNION",
-    "LIBRILLA": "LIBRILLA",
-    "LORCA": "LORCA",
-    "LORQUI": "LORQUI",
-    "LOS ALCAZARES": "LOS_ALCAZARES",
-    "MAZARRON": "MAZARRON",
-    "MOLINA DE SEGURA": "MOLINA_DE_SEGURA",
-    "MORATALLA": "MORATALLA",
-    "MULA": "MULA",
-    "MURCIA": "MURCIA",
-    "OJOS": "OJOS",
-    "PLIEGO": "PLIEGO",
-    "PUERTO LUMBRERAS": "PUERTO_LUMBRERAS",
-    "RICOTE": "RICOTE",
-    "SANTOMERA": "SANTOMERA",
-    "SAN JAVIER": "SAN_JAVIER",
-    "SAN PEDRO DEL PINATAR": "SAN_PEDRO_DEL_PINATAR",
-    "TORRE PACHECO": "TORRE_PACHECO",
-    "TOTANA": "TOTANA",
-    "ULEA": "ULEA",
-    "VILLANUEVA DEL RIO SEGURA": "VILLANUEVA_DEL_RIO_SEGURA",
-    "YECLA": "YECLA",
+    "AJALVIR": "AJALVIR",
+    "ALAMEDA DEL VALLE": "ALAMEDA DEL VALLE",
+    "ALCALA DE HENARES": "ALCALA DE HENARES",
+    "ALCOBENDAS": "ALCOBENDAS",
+    "ALCORCON": "ALCORCON",
+    "ALDEA DEL FRESNO": "ALDEA DEL FRESNO",
+    "ALGETE": "ALGETE",
+    "ALPEDRETE": "ALPEDRETE",
+    "AMBITE": "AMBITE",
+    "ANCHUELO": "ANCHUELO",
+    "ARANJUEZ": "ARANJUEZ",
+    "ARGANDA DEL REY": "ARGANDA DEL REY",
+    "ARROYOMOLINOS": "ARROYOMOLINOS",
+    "BATRES": "BATRES",
+    "BECERRIL DE LA SIERRA": "BECERRIL DE LA SIERRA",
+    "BELMONTE DE TAJO": "BELMONTE DE TAJO",
+    "BERZOSA DEL LOZOYA": "BERZOSA DEL LOZOYA",
+    "BOADILLA DEL MONTE": "BOADILLA DEL MONTE",
+    "BRAOJOS": "BRAOJOS",
+    "BREA DE TAJO": "BREA DE TAJO",
+    "BRUNETE": "BRUNETE",
+    "BUITRAGO DEL LOZOYA": "BUITRAGO DEL LOZOYA",
+    "BUSTARVIEJO": "BUSTARVIEJO",
+    "CABANILLAS DE LA SIERRA": "CABANILLAS DE LA SIERRA",
+    "CADALSO DE LOS VIDRIOS": "CADALSO DE LOS VIDRIOS",
+    "CAMARMA DE ESTERUELAS": "CAMARMA DE ESTERUELAS",
+    "CAMPO REAL": "CAMPO REAL",
+    "CANENCIA": "CANENCIA",
+    "CARABAÑA": "CARABAÑA",
+    "CASARRUBUELOS": "CASARRUBUELOS",
+    "CENICIENTOS": "CENICIENTOS",
+    "CERCEDILLA": "CERCEDILLA",
+    "CERVERA DE BUITRAGO": "CERVERA DE BUITRAGO",
+    "CHAPINERIA": "CHAPINERIA",
+    "CHINCHON": "CHINCHON",
+    "CIEMPOZUELOS": "CIEMPOZUELOS",
+    "COBEÑA": "COBEÑA",
+    "COLLADO MEDIANO": "COLLADO MEDIANO",
+    "COLLADO VILLALBA": "COLLADO VILLALBA",
+    "COLMENAR DE OREJA": "COLMENAR DE OREJA",
+    "COLMENAR DEL ARROYO": "COLMENAR DEL ARROYO",
+    "COLMENAR VIEJO": "COLMENAR VIEJO",
+    "COLMENAREJO": "COLMENAREJO",
+    "CORPA": "CORPA",
+    "COSLADA": "COSLADA",
+    "CUBAS DE LA SAGRA": "CUBAS DE LA SAGRA",
+    "DAGANZO DE ARRIBA": "DAGANZO DE ARRIBA",
+    "EL ALAMO": "EL ALAMO",
+    "EL ATAZAR": "EL ATAZAR",
+    "EL BERRUECO": "EL BERRUECO",
+    "EL BOALO": "EL BOALO",
+    "EL ESCORIAL": "EL ESCORIAL",
+    "EL MOLAR": "EL MOLAR",
+    "EL VELLON": "EL VELLON",
+    "ESTREMERA": "ESTREMERA",
+    "FRESNEDILLAS DE LA OLIVA": "FRESNEDILLAS DE LA OLIVA",
+    "FRESNO DE TOROTE": "FRESNO DE TOROTE",
+    "FUENLABRADA": "FUENLABRADA",
+    "FUENTE EL SAZ DE JARAMA": "FUENTE EL SAZ DE JARAMA",
+    "FUENTIDUEÑA DE TAJO": "FUENTIDUEÑA DE TAJO",
+    "GALAPAGAR": "GALAPAGAR",
+    "GARGANTA DE LOS MONTES": "GARGANTA DE LOS MONTES",
+    "GARGANTILLA DEL LOZOYA Y PINIL": "GARGANTILLA DEL LOZOYA Y PINIL",
+    "GASCONES": "GASCONES",
+    "GETAFE": "GETAFE",
+    "GRIÑON": "GRIÑON",
+    "GUADALIX DE LA SIERRA": "GUADALIX DE LA SIERRA",
+    "GUADARRAMA": "GUADARRAMA",
+    "HORCAJO DE LA SIERRA AOSLOS": "HORCAJO DE LA SIERRA AOSLOS",
+    "HORCAJUELO DE LA SIERRA": "HORCAJUELO DE LA SIERRA",
+    "HOYO DE MANZANARES": "HOYO DE MANZANARES",
+    "HUMANES DE MADRID": "HUMANES DE MADRID",
+    "LA ACEBEDA": "LA ACEBEDA",
+    "LA CABRERA": "LA CABRERA",
+    "LA HIRUELA": "LA HIRUELA",
+    "LA SERNA DEL MONTE": "LA SERNA DEL MONTE",
+    "LAS ROZAS DE MADRID": "LAS ROZAS DE MADRID",
+    "LEGANES": "LEGANES",
+    "LOECHES": "LOECHES",
+    "LOS MOLINOS": "LOS MOLINOS",
+    "LOS SANTOS DE LA HUMOSA": "LOS SANTOS DE LA HUMOSA",
+    "LOZOYA": "LOZOYA",
+    "LOZOYUELA NAVAS SIETEIGLESIAS": "LOZOYUELA NAVAS SIETEIGLESIAS",
+    "MADARCOS": "MADARCOS",
+    "MADRID": "MADRID",
+    "MAJADAHONDA": "MAJADAHONDA",
+    "MANZANARES EL REAL": "MANZANARES EL REAL",
+    "MECO": "MECO",
+    "MEJORADA DEL CAMPO": "MEJORADA DEL CAMPO",
+    "MIRAFLORES DE LA SIERRA": "MIRAFLORES DE LA SIERRA",
+    "MONTEJO DE LA SIERRA": "MONTEJO DE LA SIERRA",
+    "MORALEJA DE ENMEDIO": "MORALEJA DE ENMEDIO",
+    "MORALZARZAL": "MORALZARZAL",
+    "MORATA DE TAJUÑA": "MORATA DE TAJUÑA",
+    "MOSTOLES": "MOSTOLES",
+    "NAVACERRADA": "NAVACERRADA",
+    "NAVALAFUENTE": "NAVALAFUENTE",
+    "NAVALAGAMELLA": "NAVALAGAMELLA",
+    "NAVALCARNERO": "NAVALCARNERO",
+    "NAVARREDONDA Y SAN MAMES": "NAVARREDONDA Y SAN MAMES",
+    "NAVAS DEL REY": "NAVAS DEL REY",
+    "NUEVO BAZTAN": "NUEVO BAZTAN",
+    "OLMEDA DE LAS FUENTES": "OLMEDA DE LAS FUENTES",
+    "ORUSCO DE TAJUÑA": "ORUSCO DE TAJUÑA",
+    "PARACUELLOS DE JARAMA": "PARACUELLOS DE JARAMA",
+    "PARLA": "PARLA",
+    "PATONES": "PATONES",
+    "PEDREZUELA": "PEDREZUELA",
+    "PELAYOS DE LA PRESA": "PELAYOS DE LA PRESA",
+    "PERALES DE TAJUÑA": "PERALES DE TAJUÑA",
+    "PEZUELA DE LAS TORRES": "PEZUELA DE LAS TORRES",
+    "PIÑUECAR GANDULLAS": "PIÑUECAR GANDULLAS",
+    "PINILLA DEL VALLE": "PINILLA DEL VALLE",
+    "PINTO": "PINTO",
+    "POZUELO DE ALARCON": "POZUELO DE ALARCON",
+    "POZUELO DEL REY": "POZUELO DEL REY",
+    "PRADENA DEL RINCON": "PRADENA DEL RINCON",
+    "PUEBLA DE LA SIERRA": "PUEBLA DE LA SIERRA",
+    "PUENTES VIEJAS": "PUENTES VIEJAS",
+    "QUIJORNA": "QUIJORNA",
+    "RASCAFRIA": "RASCAFRIA",
+    "REDUEÑA": "REDUEÑA",
+    "RIBATEJADA": "RIBATEJADA",
+    "RIVAS VACIAMADRID": "RIVAS VACIAMADRID",
+    "ROBLEDILLO DE LA JARA": "ROBLEDILLO DE LA JARA",
+    "ROBLEDO DE CHAVELA": "ROBLEDO DE CHAVELA",
+    "ROBREGORDO": "ROBREGORDO",
+    "ROZAS DE PUERTO REAL": "ROZAS DE PUERTO REAL",
+    "SAN AGUSTIN DEL GUADALIX": "SAN AGUSTIN DEL GUADALIX",
+    "SAN FERNANDO DE HENARES": "SAN FERNANDO DE HENARES",
+    "SAN LORENZO DE EL ESCORIAL": "SAN LORENZO DE EL ESCORIAL",
+    "SAN MARTIN DE LA VEGA": "SAN MARTIN DE LA VEGA",
+    "SAN MARTIN DE VALDEIGLESIAS": "SAN MARTIN DE VALDEIGLESIAS",
+    "SAN SEBASTIAN DE LOS REYES": "SAN SEBASTIAN DE LOS REYES",
+    "SANTA MARIA DE LA ALAMEDA": "SANTA MARIA DE LA ALAMEDA",
+    "SANTORCAZ": "SANTORCAZ",
+    "SERRANILLOS DEL VALLE": "SERRANILLOS DEL VALLE",
+    "SEVILLA LA NUEVA": "SEVILLA LA NUEVA",
+    "SOMOSIERRA": "SOMOSIERRA",
+    "SOTO DEL REAL": "SOTO DEL REAL",
+    "TALAMANCA DE JARAMA": "TALAMANCA DE JARAMA",
+    "TIELMES": "TIELMES",
+    "TITULCIA": "TITULCIA",
+    "TORREJON DE ARDOZ": "TORREJON DE ARDOZ",
+    "TORREJON DE LA CALZADA": "TORREJON DE LA CALZADA",
+    "TORREJON DE VELASCO": "TORREJON DE VELASCO",
+    "TORRELAGUNA": "TORRELAGUNA",
+    "TORRELODONES": "TORRELODONES",
+    "TORREMOCHA DE JARAMA": "TORREMOCHA DE JARAMA",
+    "TORRES DE LA ALAMEDA": "TORRES DE LA ALAMEDA",
+    "TRES CANTOS": "TRES CANTOS",
+    "VALDARACETE": "VALDARACETE",
+    "VALDEAVERO": "VALDEAVERO",
+    "VALDELAGUNA": "VALDELAGUNA",
+    "VALDEMANCO": "VALDEMANCO",
+    "VALDEMAQUEDA": "VALDEMAQUEDA",
+    "VALDEMORILLO": "VALDEMORILLO",
+    "VALDEMORO": "VALDEMORO",
+    "VALDEOLMOS ALALPARDO": "VALDEOLMOS ALALPARDO",
+    "VALDEPIELAGOS": "VALDEPIELAGOS",
+    "VALDETORRES DE JARAMA": "VALDETORRES DE JARAMA",
+    "VALDILECHA": "VALDILECHA",
+    "VALVERDE DE ALCALA": "VALVERDE DE ALCALA",
+    "VELILLA DE SAN ANTONIO": "VELILLA DE SAN ANTONIO",
+    "VENTURADA": "VENTURADA",
+    "VILLA DEL PRADO": "VILLA DEL PRADO",
+    "VILLACONEJOS": "VILLACONEJOS",
+    "VILLALBILLA": "VILLALBILLA",
+    "VILLAMANRIQUE DE TAJO": "VILLAMANRIQUE DE TAJO",
+    "VILLAMANTA": "VILLAMANTA",
+    "VILLAMANTILLA": "VILLAMANTILLA",
+    "VILLANUEVA DE LA CAÑADA": "VILLANUEVA DE LA CAÑADA",
+    "VILLANUEVA DE PERALES": "VILLANUEVA DE PERALES",
+    "VILLANUEVA DEL PARDILLO": "VILLANUEVA DEL PARDILLO",
+    "VILLAR DEL OLMO": "VILLAR DEL OLMO",
+    "VILLAREJO DE SALVANES": "VILLAREJO DE SALVANES",
+    "VILLAVICIOSA DE ODON": "VILLAVICIOSA DE ODON",
+    "VILLAVIEJA DEL LOZOYA": "VILLAVIEJA DEL LOZOYA",
+    "ZARZALEJO": "ZARZALEJO",
+
 }
 
 # Función para cargar shapefiles desde GitHub
 @st.cache_data
 def cargar_shapefile_desde_github(base_name):
-    base_url = "https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_CARM/main/CATASTRO/"
+    base_url = f"https://raw.githubusercontent.com/iberiaforestal/CATASTRO_JCCM/master/CATASTRO/{municipio_file}"
     exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
     
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -140,9 +288,8 @@ def transformar_coordenadas(x, y):
         st.error("Coordenadas inválidas. Asegúrate de ingresar valores numéricos.")
         return None, None
 
-# Función para consultar si la geometría intersecta con algún polígono del GeoJSON
-# === FUNCIÓN DESCARGA CON CACHÉ ===
-@st.cache_data(show_spinner=False, ttl=604800)  # 7 días
+# === DESCARGA CON CACHÉ SOLO PARA WFS (GeoJSON) ===
+@st.cache_data(show_spinner=False, ttl=604800)
 def _descargar_geojson(url):
     try:
         response = session.get(url, timeout=30)
@@ -157,41 +304,61 @@ def _descargar_geojson(url):
             st._wfs_warnings.add(warning_key)
         return None
 
-# === FUNCIÓN PRINCIPAL (SIN CACHÉ EN GEOMETRÍA) ===
-def consultar_wfs_seguro(geom, url, nombre_afeccion, campo_nombre=None, campos_mup=None):
+
+# === FUNCIÓN UNIFICADA: WFS + ArcGIS FeatureServer ===
+def consultar_capa_seguro(geom, url, nombre_afeccion, campo_nombre=None, campos_mup=None):
     """
-    Consulta WFS con:
-    - Descarga cacheada (rápida después de la 1ª vez)
-    - Geometría NO cacheada (evita UnhashableParamError)
+    Consulta segura que soporta:
+    - WFS (GeoJSON)
+    - ArcGIS FeatureServer / MapServer (REST)
+    - Campos personalizados (MUP)
     """
-    data = _descargar_geojson(url)
-    if data is None:
-        return f"Indeterminado: {nombre_afeccion} (servicio no disponible)"
 
     try:
-        gdf = gpd.read_file(data)
+        # --- Detectar ArcGIS REST ----
+        if "FeatureServer" in url or "MapServer" in url:
+
+            # GeoPandas lo puede leer directamente si terminas en /query?...
+            if "query" not in url:
+                if not url.endswith("/"):
+                    url += "/"
+                url += "query?where=1=1&outFields=*&f=geojson"
+
+            gdf = gpd.read_file(url)
+
+        # --- Caso WFS normal ---
+        else:
+            data = _descargar_geojson(url)
+            if data is None:
+                return f"Indeterminado: {nombre_afeccion} (servicio no disponible)"
+            gdf = gpd.read_file(data)
+
+        # --- Intersección ---
         seleccion = gdf[gdf.intersects(geom)]
-        
+
         if seleccion.empty:
             return f"No afecta a {nombre_afeccion}"
 
-        # --- MODO MUP: campos personalizados ---
+        # ============================
+        #  MODO MUP (campos personalizados)
+        # ============================
         if campos_mup:
             info = []
             for _, row in seleccion.iterrows():
-                valores = [str(row.get(c.split(':')[0], "Desconocido")) for c in campos_mup]
-                etiquetas = [c.split(':')[1] if ':' in c else c.split(':')[0] for c in campos_mup]
+                valores = [str(row.get(c.split(":")[0], "Desconocido")) for c in campos_mup]
+                etiquetas = [c.split(":")[1] for c in campos_mup]
                 info.append("\n".join(f"{etiquetas[i]}: {valores[i]}" for i in range(len(campos_mup))))
             return f"Dentro de {nombre_afeccion}:\n" + "\n\n".join(info)
 
-        # --- MODO NORMAL: solo nombres ---
-        else:
-            nombres = ', '.join(seleccion[campo_nombre].dropna().unique())
-            return f"Dentro de {nombre_afeccion}: {nombres}"
+        # ============================
+        #  MODO NORMAL
+        # ============================
+        nombres = ', '.join(seleccion[campo_nombre].dropna().unique())
+        return f"Dentro de {nombre_afeccion}: {nombres}"
 
     except Exception as e:
         return f"Indeterminado: {nombre_afeccion} (error de datos)"
-
+        
 # Función para crear el mapa con afecciones específicas
 def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
     if lon is None or lat is None:
@@ -201,69 +368,129 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
     m = folium.Map(location=[lat, lon], zoom_start=16)
     folium.Marker([lat, lon], popup=f"Coordenadas transformadas: {lon}, {lat}").add_to(m)
 
-    if parcela_gdf is not None and not parcela_gdf.empty:
+    # ==========================================
+    # 1) DIBUJAR PARCELA (robusto para cualquier formato)
+    # ==========================================
+    if parcela_gdf is not None:
         try:
+            if hasattr(parcela_gdf, 'geometry') and not hasattr(parcela_gdf, 'to_crs'):
+                parcela_gdf = gpd.GeoDataFrame([parcela_gdf], crs="EPSG:25830")
+
             parcela_4326 = parcela_gdf.to_crs("EPSG:4326")
             folium.GeoJson(
                 parcela_4326.to_json(),
                 name="Parcela",
-                style_function=lambda x: {'fillColor': 'transparent', 'color': 'blue', 'weight': 2, 'dashArray': '5, 5'}
+                style_function=lambda x: {
+                    'fillColor': 'transparent',
+                    'color': 'blue',
+                    'weight': 3,
+                    'dashArray': '5, 5'
+                }
             ).add_to(m)
-        except Exception as e:
-            st.error(f"Error al añadir la parcela al mapa: {str(e)}")
 
-    wms_layers = [
-        ("Red Natura 2000", "SIG_LUP_SITES_CARM:RN2000"),
-        ("Montes", "PFO_ZOR_DMVP_CARM:MONTES"),
-        ("Vias Pecuarias", "PFO_ZOR_DMVP_CARM:VP_CARM")
-    ]
-    for name, layer in wms_layers:
+        except Exception as e:
+            st.warning(f"No se pudo dibujar la parcela en el mapa: {str(e)}")
+
+    # ==========================================
+    # 2) CAPAS WMS
+    # ==========================================
+    capas = {
+        "Red Natura 2000 (WMS)": ("LugaresProtegidos", "IDEM_MA_RED_NATURA_LIC_ZEC"),
+        "Montes (WMS)": ("Montes", "IDEM_MA_MONTES_UP"),
+        "Vías Pecuarias (WMS)": ("ViasPecuarias", "IDEM_MA_VIAS_PECUARIAS")
+    }
+    
+    for nombre, (servicio, layer) in capas.items():
+        url = f"https://idem.comunidad.madrid/geoidem/{servicio}/wms?"
         try:
             folium.raster_layers.WmsTileLayer(
-                url="https://mapas-gis-inter.carm.es/geoserver/ows?SERVICE=WMS&?",
-                name=name,
-                fmt="image/png",
+                url=url,
+                name=nombre,
                 layers=layer,
+                fmt="image/png",
                 transparent=True,
                 opacity=0.25,
                 control=True
             ).add_to(m)
         except Exception as e:
-            st.error(f"Error al cargar la capa WMS {name}: {str(e)}")
+            st.error(f"Error cargando WMS {nombre}: {str(e)}")
+
+    for name, url, style_cfg in arcgis_layers:
+
+        # Bounding box pequeño alrededor del punto
+        delta = 0.02  # unos ±2 km (ajustable)
+        
+        bbox = f"{lon-delta},{lat-delta},{lon+delta},{lat+delta}"
+        
+        geojson_url = (
+            f"{url}/query?"
+            f"geometry={bbox}&geometryType=esriGeometryEnvelope"
+            f"&spatialRel=esriSpatialRelIntersects"
+            f"&outFields=*&f=geojson"
+        )
+
+        try:
+            response = requests.get(geojson_url)
+            response.raise_for_status()
+            data = response.json()
+
+            folium.GeoJson(
+                data,
+                name=name,
+                style_function=lambda x, cfg=style_cfg: {
+                    "color": cfg["color"],
+                    "weight": 2,
+                    "fillColor": cfg["fillColor"],
+                    "fillOpacity": 0.3
+                }
+            ).add_to(m)
+
+        except Exception as e:
+            st.error(f"Error al cargar la capa {name}: {str(e)}")
 
     folium.LayerControl().add_to(m)
 
+    # ===============================
+    # LEYENDA
+    # ===============================
     legend_html = """
     {% macro html(this, kwargs) %}
-<div style="
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background-color: white;
-    border: 1px solid grey;
-    z-index: 9999;
-    font-size: 10px;
-    padding: 5px;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-    line-height: 1.1em;
-    width: auto;
-    transform: scale(0.75);
-    transform-origin: top left;
-">
-    <b>Leyenda</b><br>
-    <div>
-        <img src="https://mapas-gis-inter.carm.es/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=SIG_LUP_SITES_CARM%3ARN2000" alt="Red Natura"><br>
-        <img src="https://mapas-gis-inter.carm.es/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=PFO_ZOR_DMVP_CARM%3AMONTES" alt="Montes"><br>
-        <img src="https://mapas-gis-inter.carm.es/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=PFO_ZOR_DMVP_CARM%3AVP_CARM" alt="Vias Pecuarias"><br>
+    <div style="
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background-color: white;
+        border: 1px solid grey;
+        z-index: 9999;
+        font-size: 10px;
+        padding: 5px;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+        line-height: 1.1em;
+        width: auto;
+        transform: scale(0.75);
+        transform-origin: top left;
+    ">
+        <b>Leyenda</b><br>
+
+        <div>
+            <span style="display:inline-block;width:20px;height:20px;background:#00FF00;border:1px solid #008000;"></span>
+            Red Natura 2000<br>
+
+            <span style="display:inline-block;width:20px;height:20px;background:#CD853F;border:1px solid #8B4513;"></span>
+            Montes Utilidad Pública<br>
+
+            <span style="display:inline-block;width:20px;height:20px;background:#87CEFA;border:1px solid #0000FF;"></span>
+            Vías Pecuarias<br>
+        </div>
     </div>
-</div>
-{% endmacro %}
-"""
+    {% endmacro %}
+    """
 
     legend = MacroElement()
     legend._template = Template(legend_html)
     m.get_root().add_child(legend)
 
+    # Añadir marcadores de afecciones
     for afeccion in afecciones:
         folium.Marker([lat, lon], popup=afeccion).add_to(m)
 
@@ -360,7 +587,7 @@ def generar_pdf(datos, x, y, filename):
     if not os.path.exists(logo_path):
         st.error("FALTA EL ARCHIVO: 'logos.jpg' en la raíz del proyecto.")
         st.markdown(
-            "Descárgalo aquí: [logos.jpg](https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_CARM/main/logos.jpg)"
+            "Descárgalo aquí: [logos.jpg](https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg)"
         )
         logo_path = None
     else:
@@ -1671,37 +1898,27 @@ if submitted:
 
             # === 5. GUARDAR query_geom Y URLs EN SESSION_STATE ===
             st.session_state['query_geom'] = query_geom
-            flora_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_ZOR_PLANIGEST_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_ZOR_PLANIGEST_CARM:planes_recuperacion_flora2014&outputFormat=application/json"
-            garbancillo_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_ZOR_PLANIGEST_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_ZOR_PLANIGEST_CARM:plan_recuperacion_garbancillo&outputFormat=application/json"
-            malvasia_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_ZOR_PLANIGEST_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_ZOR_PLANIGEST_CARM:plan_recuperacion_malvasia&outputFormat=application/json"
-            fartet_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_ZOR_PLANIGEST_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_ZOR_PLANIGEST_CARM:plan_recuperacion_fartet&outputFormat=application/json"
-            nutria_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_ZOR_PLANIGEST_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_ZOR_PLANIGEST_CARM:plan_recuperacion_nutria&outputFormat=application/json"
-            perdicera_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_ZOR_PLANIGEST_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_ZOR_PLANIGEST_CARM:plan_recuperacion_perdicera&outputFormat=application/json"
-            tortuga_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_DES_BIOTA_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_DES_BIOTA_CARM:tortuga_distribucion_2001&outputFormat=application/json"
-            uso_suelo_url = "https://mapas-gis-inter.carm.es/geoserver/SIT_USU_PLA_URB_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIT_USU_PLA_URB_CARM:plu_ze_37_mun_uso_suelo&outputFormat=application/json"
-            esteparias_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_DES_BIOTA_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_DES_BIOTA_CARM:esteparias_ceea_2019_10x10&outputFormat=application/json"
-            enp_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_LUP_SITES_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_LUP_SITES_CARM:ENP&outputFormat=application/json"
-            zepa_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_LUP_SITES_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_LUP_SITES_CARM:ZEPA&outputFormat=application/json"
-            lic_url = "https://mapas-gis-inter.carm.es/geoserver/SIG_LUP_SITES_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=SIG_LUP_SITES_CARM:LIC-ZEC&outputFormat=application/json"
-            vp_url = "https://mapas-gis-inter.carm.es/geoserver/PFO_ZOR_DMVP_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=PFO_ZOR_DMVP_CARM:VP_CARM&outputFormat=application/json"
-            tm_url = "https://mapas-gis-inter.carm.es/geoserver/MAP_UAD_DIVISION-ADMINISTRATIVA_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=MAP_UAD_DIVISION-ADMINISTRATIVA_CARM:recintos_municipales_inspire_carm_etrs89&outputFormat=application/json"
-            mup_url = "https://mapas-gis-inter.carm.es/geoserver/PFO_ZOR_DMVP_CARM/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=PFO_ZOR_DMVP_CARM:MONTES&outputFormat=application/json"
+            corredores_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_CORREDORES_ECO&outputFormat=application/json"
+            humedales_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_CEH_HUMEDALES&outputFormat=application/json"
+            biosfera_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RESERVA_BIOS&outputFormat=application/json"
+            nitratos_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_ZONAS_VULNERAB&outputFormat=application/json"                           
+            uso_suelo_url = "https://idem.comunidad.madrid/geoidem/UsoDelSuelo/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=UsoDelSuelo:IDEM_URB_GEN_CALI_CLASI_10&outputFormat=application/json"
+            enp_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_ENP&outputFormat=application/json"
+            zepa_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RED_NATURA_ZEPA&outputFormat=application/json"
+            lic_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RED_NATURA_LIC_ZEC&outputFormat=application/json"
+            vp_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_VIAS_PECUARIAS&outputFormat=application/json"
+            mup_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_MONTES_UP&outputFormat=application/json"
             st.session_state['wfs_urls'] = {
                 'enp': enp_url, 'zepa': zepa_url, 'lic': lic_url,
-                'vp': vp_url, 'tm': tm_url, 'mup': mup_url, 
-                'esteparias': esteparias_url,
+                'vp': vp_url, 'mup': mup_url, 
+                'corredores': corredores_url,
                 'uso_suelo': uso_suelo_url,
-                'tortuga': tortuga_url,
-                'perdicera': perdicera_url,
-                'nutria': nutria_url,
-                'fartet': fartet_url,
-                'malvasia': malvasia_url,
-                'garbancillo': garbancillo_url,
-                'flora': flora_url
+                'humedales': humedales_url,
+                'biosfera': biosfera_url
             }
 
             # === 6. CONSULTAR AFECCIONES ===
-            afeccion_flora = consultar_wfs_seguro(query_geom, flora_url, "FLORA", campo_nombre="tipo")
+            afeccion_corredores = consultar_wfs_seguro(query_geom, corredores_url, "FLORA", campo_nombre="tipo")
             afeccion_garbancillo = consultar_wfs_seguro(query_geom, garbancillo_url, "GARBANCILLO", campo_nombre="tipo")
             afeccion_malvasia = consultar_wfs_seguro(query_geom, malvasia_url, "MALVASIA", campo_nombre="clasificac")
             afeccion_fartet = consultar_wfs_seguro(query_geom, fartet_url, "FARTET", campo_nombre="clasificac")
