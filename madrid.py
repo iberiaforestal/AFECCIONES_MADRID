@@ -308,7 +308,7 @@ def _descargar_geojson(url):
 
 
 # === FUNCIÓN UNIFICADA: WFS + ArcGIS FeatureServer ===
-def consultar_capa_seguro(geom, url, nombre_afeccion, campo_nombre=None, campos_mup=None):
+def consultar_wfs_seguro(geom, url, nombre_afeccion, campo_nombre=None, campos_mup=None):
     """
     Consulta segura que soporta:
     - WFS (GeoJSON)
