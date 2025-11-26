@@ -1730,7 +1730,7 @@ st.image(
     "https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg",
     width=250 # ← más pequeño (prueba 160-200)
 )
-st.title("Informe basico de Afecciones al medio")
+st.title("Informe basico de Afecciones al Medio Natural")
 
 modo = st.radio("Seleccione el modo de búsqueda. Recuerde que la busqueda por parcela analiza afecciones al total de la superficie de la parcela, por el contrario la busqueda por coodenadas analiza las afecciones del punto", ["Por coordenadas", "Por parcela"])
 
