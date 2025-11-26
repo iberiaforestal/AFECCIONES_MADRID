@@ -672,7 +672,7 @@ def generar_pdf(datos, x, y, filename):
     uso_suelo_key = "Afección PLANEAMIENTO"
     humedales_key = "Afección HUMEDALES"
     biosfera_key = "Afección RESERVA DE LA BIOSFERA"
-    nitratos_key = "Afección CONTAMINACION POR NITRATOS"
+    nitratos_key = "afección nitratos"
         
 # === PROCESAR TODAS LAS CAPAS ===
     def procesar_capa(url, key, valor_inicial, campos, detectado_list):
