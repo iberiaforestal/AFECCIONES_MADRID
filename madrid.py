@@ -662,7 +662,7 @@ def generar_pdf(datos, x, y, filename):
     pdf.ln(10)
     seccion_titulo("3. Afecciones detectadas")
         
-    afecciones_keys = ["Afección TM"]
+    afecciones_keys = []
     vp_key = "afección VP"
     mup_key = "afección MUP"
     zepa_key = "afección ZEPA"
@@ -785,14 +785,13 @@ def generar_pdf(datos, x, y, filename):
 
     # Procesar otras afecciones como texto
     otras_afecciones = []
-    for key in afecciones_keys:
-        valor = datos.get(key, "").strip()
-        key_corregido = key  # ← SIN .replace()
+    if afecciones_keys:
+        for key in afecciones_keys:
+            valor = datos.get(key, "").strip()
+            if not valor:
+                valor = "No afecta"
     
-        if valor and not valor.startswith("Error"):
-            otras_afecciones.append((key_corregido, valor))
-        else:
-            otras_afecciones.append((key_corregido, valor if valor else "No afecta"))
+            otras_afecciones.append((key, valor))
 
     # Solo incluir en "otras afecciones" si NO tienen detecciones
     if not nitratos_detectado:
