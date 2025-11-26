@@ -1728,7 +1728,7 @@ def generar_pdf(datos, x, y, filename):
 # Interfaz de Streamlit
 st.image(
     "https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg",
-    width=350 # ← más pequeño (prueba 160-200)
+    width=250 # ← más pequeño (prueba 160-200)
 )
 st.title("Informe basico de Afecciones al medio")
 
