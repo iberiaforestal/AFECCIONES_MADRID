@@ -226,9 +226,10 @@ shp_urls = {
 }
 
 # Función para cargar shapefiles desde GitHub
-@st.cache_data
+@st.cache_data(ttl=86400, show_spinner=False)
 def cargar_shapefile_desde_github(municipio_file):
     base_url = f"https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/CATASTRO/{municipio_file}/"
+    base_url = base_url.replace(" ", "%20")
     exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
     
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -255,6 +256,7 @@ def cargar_shapefile_desde_github(municipio_file):
         except Exception as e:
             st.error(f"Error al leer shapefile: {str(e)}")
             return None
+            
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
 def encontrar_municipio_poligono_parcela(x, y):
     try:
