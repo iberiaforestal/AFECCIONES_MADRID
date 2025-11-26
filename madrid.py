@@ -647,7 +647,7 @@ def generar_pdf(datos, x, y, filename):
         campo_orden(pdf, campo.capitalize(), valor if valor else "No disponible")
 
     pdf.set_font("Arial", "B", 11)
-    pdf.cell(0, 10, f"Coordenadas ETRS89: X = {x}, Y = {y}", ln=True)
+    pdf.cell(0, 10, f"Coordenadas ETRS89: X = {x:.2f}, Y = {y:.2f}", ln=True)
 
     imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
     if imagen_mapa_path and os.path.exists(imagen_mapa_path):
