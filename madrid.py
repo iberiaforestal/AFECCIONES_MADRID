@@ -1627,8 +1627,8 @@ def generar_pdf(datos, x, y, filename):
     # === PIE ===
     pdf.ln(10)
     pdf.set_font("Arial", "", 9)
-    pdf.multi_cell(0, line_h,        
-        "Para mas informacion.\n\n"
+    pdf.multi_cell(0, 6,        
+        "Para mas información:\n"
         "E-mail: info@iberiaforestal.es",
         align="J"
     )
