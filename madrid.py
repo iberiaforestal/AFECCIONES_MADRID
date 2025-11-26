@@ -587,7 +587,7 @@ def generar_pdf(datos, x, y, filename):
     # TÍTULO GRANDE SOLO EN LA PRIMERA PÁGINA
     pdf.set_font("Arial", "B", 16)
     pdf.set_text_color(0, 0, 0)
-    pdf.cell(0, 12, "Informe preliminar de Afecciones Forestales", ln=True, align="C")
+    pdf.cell(0, 12, "Informe preliminar de Afecciones al Medio Natural", ln=True, align="C")
     pdf.ln(10)
 
     azul_rgb = (141, 179, 226)
