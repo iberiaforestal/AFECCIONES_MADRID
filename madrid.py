@@ -406,6 +406,7 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
         url = f"https://idem.comunidad.madrid/geoidem/ows?"
         try:
             folium.raster_layers.WmsTileLayer(
+                url=url,
                 name=name,
                 fmt="image/png",
                 layers=layer,
