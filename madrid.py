@@ -20,6 +20,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import shutil
 import zipfile
+import io
 from PIL import Image
 def normalize_name(name):
     # Mantener espacios intactos
