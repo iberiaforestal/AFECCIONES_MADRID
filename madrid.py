@@ -710,7 +710,7 @@ def generar_pdf(datos, x, y, filename):
     # === ZEPA ===
     zepa_detectado = []
     zepa_valor = procesar_capa(
-        zepa_url, "afección ZEPA", "No afecta a ninguna Zona de especial protección para las aves",
+        zepa_url, "afección ZEPA", "No afecta a ninguna Zona de Especial Protección para las Aves",
         ["CD_ZEPA", "DS_ZEPA"],
         zepa_detectado
     )
@@ -766,7 +766,7 @@ def generar_pdf(datos, x, y, filename):
     # === NITRATOS ===    
     nitratos_detectado = []
     nitratos_valor = procesar_capa(
-        nitratos_url, "afección nitratos", "No afecta a Zonas Contaminados por Nitratos",
+        nitratos_url, "afección nitratos", "No afecta a Zonas Contaminadas por Nitratos",
         ["CD_ZONA", "DS_DESCRIPCIO"],
         nitratos_detectado
     )    
