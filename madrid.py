@@ -661,7 +661,8 @@ def generar_pdf(datos, x, y, filename):
     pdf.add_page()
     pdf.ln(10)
     seccion_titulo("3. Afecciones detectadas")
-
+        
+    afecciones_keys = ["Afección TM"]
     vp_key = "afección VP"
     mup_key = "afección MUP"
     zepa_key = "afección ZEPA"
