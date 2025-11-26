@@ -847,7 +847,8 @@ def generar_pdf(datos, x, y, filename):
                 pdf.ln(line_height)  # Avanzar solo lo necesario
         pdf.ln(2)
 
-    # === TABLA USO DEL SUELO ===    
+    # === TABLA USO DEL SUELO ===
+    uso_suelo_detectado = list(set(tuple(row) for row in uso_suelo_detectado))  # ← ELIMINA DUPLICADOS
     if uso_suelo_detectado:
     
         # Estimamos altura inicial
