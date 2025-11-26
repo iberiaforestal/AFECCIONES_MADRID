@@ -442,8 +442,8 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
         <div>
             <span style="display:inline-block;width:20px;height:20px;background:#00FF00;border:1px solid #008000;"></span>
             Red Natura 2000<br>
-
-            <span style="display:inline-block;width:20px;height:20px;background:#CD853F;border:1px solid #8B4513;"></span>
+    
+            <span style="display:inline-block;width:20px;height:20px;background:#FF00FF;border:1px solid #8B008B;"></span>
             Montes Utilidad Pública<br>
 
             <span style="display:inline-block;width:20px;height:20px;background:#87CEFA;border:1px solid #0000FF;"></span>
