@@ -676,9 +676,7 @@ def generar_pdf(datos, x, y, filename):
         
 # === PROCESAR TODAS LAS CAPAS ===
     def procesar_capa(url, key, valor_inicial, campos, detectado_list):
-        valor_raw = datos.get(key)
-        valor = str(valor_raw).strip() if valor_raw not in (None, "") else ""
-    
+        valor = datos.get(key, "").strip()
         if valor and not valor.startswith("No afecta") and not valor.startswith("Error"):
             try:
                 data = _descargar_geojson(url)
@@ -695,7 +693,6 @@ def generar_pdf(datos, x, y, filename):
             except Exception as e:
                 st.error(f"Error al procesar {key}: {e}")
                 return "Error al consultar"
-    
         return valor_inicial if not detectado_list else ""
 
     # === VP ===
