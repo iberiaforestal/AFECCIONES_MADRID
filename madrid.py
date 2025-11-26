@@ -684,32 +684,15 @@ def generar_pdf(datos, x, y, filename):
     pdf.set_font("Arial", "B", 11)
     pdf.cell(0, 10, f"Coordenadas ETRS89: X = {x}, Y = {y}", ln=True)
 
-# ==================================================================
-    # MAPA BONITO EN EL PDF (el mismo que ve el usuario en pantalla)
-    # ==================================================================
-    imagen_mapa_path = None
-    mapa_html_guardado = st.session_state.get('mapa_html')
-
-    if mapa_html_guardado and os.path.exists(mapa_html_guardado):
-        png_path = os.path.join(tempfile.gettempdir(), f"mapa_pdf_{uuid.uuid4().hex[:8]}.png")
-        imagen_mapa_path = mapa_folium_a_png(mapa_html_guardado, png_path, zoom=17, delay=7)
-        
-        if not imagen_mapa_path:
-            st.warning("No se pudo generar el mapa detallado → se usa uno básico")
-            imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
-    else:
-        imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
-
-    # Insertar la imagen (más grande y centrada)
+    imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
     if imagen_mapa_path and os.path.exists(imagen_mapa_path):
         epw = pdf.w - 2 * pdf.l_margin
         pdf.ln(5)
         pdf.set_font("Arial", "B", 11)
         pdf.cell(0, 7, "Mapa de localización:", ln=True, align="C")
-        image_width = epw * 0.92  # más grande y espectacular
-        x_centered = pdf.l_margin + (epw - image_width) / 2
+        image_width = epw * 0.5
+        x_centered = pdf.l_margin + (epw - image_width) / 2  # Calcular posición x para centrar
         pdf.image(imagen_mapa_path, x=x_centered, w=image_width)
-        pdf.ln(5)
     else:
         pdf.set_font("Arial", "", 11)
         pdf.cell(0, 7, "No se pudo generar el mapa de localización.", ln=True)
