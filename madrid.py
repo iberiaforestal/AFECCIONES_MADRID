@@ -280,7 +280,7 @@ def encontrar_municipio_poligono_parcela(x, y):
 def transformar_coordenadas(x, y):
     try:
         x, y = float(x), float(y)
-        if not (500000 <= x <= 800000 and 4000000 <= y <= 4800000):
+        if not (380000 <= x <= 510000 and 4430000 <= 4535000):
             st.error("Coordenadas fuera del rango esperado para ETRS89 UTM Zona 30")
             return None, None
         transformer = Transformer.from_crs("EPSG:25830", "EPSG:4326", always_xy=True)
