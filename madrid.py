@@ -680,30 +680,37 @@ def generar_pdf(datos, x, y, filename):
         valor_raw = datos.get(key)
         valor = (str(valor_raw) if valor_raw is not None else "").strip()
     
-        # Si no hay URL, no intentamos descargar nada (evita pasar None a requests/geopandas)
+        # Si no hay URL, no intentamos descargar nada
         if not url:
-            # Si ya hay detecciones, devolvemos cadena vacía (ya se completó)
             return "" if detectado_list else valor_inicial
     
-        # Solo consultamos si el valor indica que debería consultarse (evita errores)
+        # Solo consultamos si procede
         if valor and not valor.startswith("No afecta") and not valor.startswith("Error"):
             try:
                 data = _descargar_geojson(url)
                 if data is None:
                     return "Error al consultar"
+    
                 gdf = gpd.read_file(data)
-                seleccion = gdf[gdf.intersects(query_geom)]
+    
+                # CONVERSIÓN DE CRS — ***ESTO ES LO QUE FALTABA***
+                query_geom_utm = query_geom.to_crs(gdf.crs)
+    
+                # Intersección correcta
+                seleccion = gdf[gdf.intersects(query_geom_utm)]
+    
                 if not seleccion.empty:
                     for _, props in seleccion.iterrows():
                         fila = tuple(props.get(campo, "N/A") for campo in campos)
                         detectado_list.append(fila)
                     return ""
+    
                 return valor_inicial
+    
             except Exception as e:
-                # Mostrar detalle para depuración (puedes quitar el str(e) largo luego)
                 st.error(f"Error al procesar {key}: {e}")
                 return "Error al consultar"
-        # Si no hay valor y no hay detecciones devolver el valor inicial
+    
         return valor_inicial if not detectado_list else ""
 
     # === VP ===
