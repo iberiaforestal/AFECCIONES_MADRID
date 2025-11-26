@@ -427,28 +427,18 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
         bottom: 20px;
         left: 20px;
         background-color: white;
-        border: 1px solid grey;
+        border: 2px solid grey;
         z-index: 9999;
-        font-size: 10px;
-        padding: 5px;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-        line-height: 1.1em;
-        width: auto;
-        transform: scale(0.75);
-        transform-origin: top left;
-    ">
+        font-size: 11px;
+        padding: 8px;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        line-height: 1.4em;
+        border-radius: 5px;
+        ">
         <b>Leyenda</b><br>
-
-        <div>
-            <span style="display:inline-block;width:20px;height:20px;background:#00FF00;border:1px solid #008000;"></span>
-            Red Natura 2000<br>
-    
-            <span style="display:inline-block;width:20px;height:20px;background:#FF00FF;border:1px solid #8B008B;"></span>
-            Montes Utilidad Pública<br>
-
-            <span style="display:inline-block;width:20px;height:20px;background:#87CEFA;border:1px solid #0000FF;"></span>
-            Vías Pecuarias<br>
-        </div>
+        <i style="background:#ff000080; width:18px; height:4px; display:inline-block; border:1px solid #ff0000;"></i> Red Natura 2000 (ZEC/LIC)<br>
+        <i style="background:#006400; width:18px; height:4px; display:inline-block; border:1px solid #006400;"></i> Montes de Utilidad Pública<br>
+        <i style="background:#0000ff; width:18px; height:4px; display:inline-block; border:1px solid #0000ff;"></i> Vías Pecuarias
     </div>
     {% endmacro %}
     """
