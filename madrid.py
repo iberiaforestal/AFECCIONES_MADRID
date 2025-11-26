@@ -548,6 +548,45 @@ def hay_espacio_suficiente(pdf, altura_necesaria, margen_inferior=20):
     espacio_disponible = pdf.h - pdf.get_y() - margen_inferior
     return espacio_disponible >= altura_necesaria
 
+# ==================================================================
+# NUEVA FUNCIÓN: Convertir mapa Folium bonito en PNG para el PDF
+# ==================================================================
+import selenium
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import time
+
+def mapa_folium_a_png(mapa_html_path, png_path, zoom=17, width=1100, height=750, delay=7):
+    """
+    Genera una captura de alta calidad del mapa Folium (el mismo que ve el usuario)
+    """
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-features=VizDisplayCompositor")
+    options.add_argument(f"--window-size={width},{height}")
+
+    driver = webdriver.Chrome(options=options)
+    
+    try:
+        file_url = f"file://{os.path.abspath(mapa_html_path)}"
+        driver.get(file_url)
+        time.sleep(delay)  # espera a que carguen todas las capas WMS
+        
+        # Aseguramos zoom y centrado perfecto
+        driver.execute_script(f"if (map) {{ map.setZoom({zoom}); }}")
+        time.sleep(1)
+        
+        driver.save_screenshot(png_path)
+        return png_path
+    except Exception as e:
+        st.warning(f"No se pudo capturar el mapa bonito: {e}")
+        return None
+    finally:
+        driver.quit()
+
 def generar_pdf(datos, x, y, filename):
     logo_path = "logos.jpg"
 
@@ -645,15 +684,32 @@ def generar_pdf(datos, x, y, filename):
     pdf.set_font("Arial", "B", 11)
     pdf.cell(0, 10, f"Coordenadas ETRS89: X = {x}, Y = {y}", ln=True)
 
-    imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
+# ==================================================================
+    # MAPA BONITO EN EL PDF (el mismo que ve el usuario en pantalla)
+    # ==================================================================
+    imagen_mapa_path = None
+    mapa_html_guardado = st.session_state.get('mapa_html')
+
+    if mapa_html_guardado and os.path.exists(mapa_html_guardado):
+        png_path = os.path.join(tempfile.gettempdir(), f"mapa_pdf_{uuid.uuid4().hex[:8]}.png")
+        imagen_mapa_path = mapa_folium_a_png(mapa_html_guardado, png_path, zoom=17, delay=7)
+        
+        if not imagen_mapa_path:
+            st.warning("No se pudo generar el mapa detallado → se usa uno básico")
+            imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
+    else:
+        imagen_mapa_path = generar_imagen_estatica_mapa(x, y)
+
+    # Insertar la imagen (más grande y centrada)
     if imagen_mapa_path and os.path.exists(imagen_mapa_path):
         epw = pdf.w - 2 * pdf.l_margin
         pdf.ln(5)
         pdf.set_font("Arial", "B", 11)
         pdf.cell(0, 7, "Mapa de localización:", ln=True, align="C")
-        image_width = epw * 0.5
-        x_centered = pdf.l_margin + (epw - image_width) / 2  # Calcular posición x para centrar
+        image_width = epw * 0.92  # más grande y espectacular
+        x_centered = pdf.l_margin + (epw - image_width) / 2
         pdf.image(imagen_mapa_path, x=x_centered, w=image_width)
+        pdf.ln(5)
     else:
         pdf.set_font("Arial", "", 11)
         pdf.cell(0, 7, "No se pudo generar el mapa de localización.", ln=True)
