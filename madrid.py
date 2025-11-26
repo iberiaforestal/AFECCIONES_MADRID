@@ -943,8 +943,7 @@ def generar_pdf(datos, x, y, filename):
             nombre_lines = pdf.multi_cell(col_widths[1], line_height, str(DS_NOMBRE), split_only=True) or [""]
             muni_lines = pdf.multi_cell(col_widths[2], line_height, str(DS_MUNI), split_only=True) or [""]
             tipo_lines = pdf.multi_cell(col_widths[3], line_height, str(DS_TIPO), split_only=True) or [""]
-    
-            row_h = max(row_height, len(nombre_lines)*line_height, len(muni_lines)*line_height)
+            row_h = max(row_height, len(nombre_lines)*line_height, len(muni_lines)*line_height, len(tipo_lines)*line_height)
     
             # ⇩ NUEVO: Evitar saltos de página a mitad de fila
             if not hay_espacio_suficiente(pdf, row_h):
