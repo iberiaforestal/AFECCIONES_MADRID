@@ -1817,15 +1817,27 @@ if submitted:
             # === 11. LIMPIAR DATOS TEMPORALES ===
             st.session_state.pop('query_geom', None)
             st.session_state.pop('wfs_urls', None)
-if st.session_state['mapa_html'] and st.session_state['pdf_file']:
+if st.session_state.get('mapa_html') and st.session_state.get('pdf_file'):
     try:
-        with open(st.session_state['pdf_file'], "rb") as f:
-            st.download_button("📄 Descargar informe PDF", f, file_name="informe_afecciones.pdf")
+        # Crear un ZIP en memoria con los dos archivos
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            # Añadir el PDF
+            with open(st.session_state['pdf_file'], "rb") as f:
+                zip_file.writestr("informe_afecciones.pdf", f.read())
+            
+            # Añadir el mapa HTML
+            with open(st.session_state['mapa_html'], "rb") as f:
+                zip_file.writestr("mapa_interactivo.html", f.read())
+        
+        zip_buffer.seek(0)
+        
+        st.download_button(
+            label="Descargar informe completo (PDF + Mapa interactivo)",
+            data=zip_buffer,
+            file_name="informe_completo_afecciones.zip",
+            mime="application/zip"
+        )
+        
     except Exception as e:
-        st.error(f"Error al descargar el PDF: {str(e)}")
-
-    try:
-        with open(st.session_state['mapa_html'], "r") as f:
-            st.download_button("🌍 Descargar mapa HTML", f, file_name="mapa_busqueda.html")
-    except Exception as e:
-        st.error(f"Error al descargar el mapa HTML: {str(e)}")
+        st.error(f"Error al crear el archivo ZIP: {str(e)}")
