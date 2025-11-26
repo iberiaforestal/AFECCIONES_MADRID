@@ -798,13 +798,13 @@ def generar_pdf(datos, x, y, filename):
     if not nitratos_detectado:
         otras_afecciones.append(("Afección a nitratos", nitratos_valor if nitratos_valor else "No afecta a Contaminación por Nitratos"))
     if not biosfera_detectado:
-        otras_afecciones.append(("Afección a Reserva de la Biosfera", biosfera_valor if biosfera_valor else "No afecta a Reserva de la Biosfera"))
+        otras_afecciones.append(("Reserva de la Biosfera", biosfera_valor if biosfera_valor else "No afecta a Reserva de la Biosfera"))
     if not humedales_detectado:
         otras_afecciones.append(("Afección a humedales", humedales_valor if humedales_valor else "No afecta a Humedales"))
     if not uso_suelo_detectado:
         otras_afecciones.append(("Afección Uso del Suelo", uso_suelo_valor if uso_suelo_valor else "No afecta a ningún uso del suelo protegido"))
     if not corredores_detectado:
-        otras_afecciones.append(("Afección a Corredores Ecológicos", corredores_valor if corredores_valor else "No afecta a Corredores Ecológicos"))
+        otras_afecciones.append(("Corredores Ecológicos", corredores_valor if corredores_valor else "No afecta a Corredores Ecológicos"))
     if not enp_detectado:
         otras_afecciones.append(("Afección ENP", enp_valor if enp_valor else "No se encuentra en ningún ENP"))
     if not lic_detectado:
