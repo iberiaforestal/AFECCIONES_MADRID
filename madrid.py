@@ -1137,7 +1137,7 @@ def generar_pdf(datos, x, y, filename):
             pdf.add_page()
     
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afecciones a Lugar de Importancia Comunitaria (LIC):", ln=True)
+        pdf.cell(0, 5, "Afecciones a Lugares de Importancia Comunitaria (LIC):", ln=True)
         pdf.ln(2)
     
         col_w_code = 30
@@ -1618,12 +1618,12 @@ def generar_pdf(datos, x, y, filename):
         # Volver a negrita para el resto del texto
     pdf.set_font("Arial", "B", 9)  # Restaurar negrita
     texto_final = (
-        "\nLas afecciones del presente informe se basan en cartografia oficial de la Comunidad Autonoma y de la Direccion General del Catastro, cumpliendo el estandar tecnico Web Feature Service (WFS) definido por el Open Geospatial Consortium (OGC) y la Directiva INSPIRE, eximiendo a IBERIA FORESTAL INGENIERIA S.L de cualquier error en la cartografia.\n\n"
-        "El Planeamiento se regira por la Ley 9/2001, de 17 de julio, del Suelo, de la Comunidad de Madrid, y por el PGOU del termino municipal. El Regimen del suelo no urbanizable de protección se recoge en el articulo 29 de la citada Ley.\n\n"
-        "En suelo no urbanizable se prestara especial atencion al artículo 3 de la Ley 16/1995, de 4 de mayo, Forestal y de Protección de la Naturaleza de la Comunidad de Madrid, y al artículo 5 de la Ley 43/2003, de 21 de noviembre, de Montes. Solicitando para posibles cambios de uso lo establecido en la normativa de referencia.\n\n"
-        "De acuerdo con lo establecido en el articulo 22.1 de la ley 43/2003 de 21 de noviembre de Montes, toda inmatriculacion o inscripcion de exceso de cabida en el Registro de la Propiedad de un monte o de una finca colindante con monte demanial o ubicado en un termino municipal en el que existan montes demaniales requerira el previo informe favorable de los titulares de dichos montes y, para los montes catalogados, el del organo forestal de la comunidad autonoma.\n\n"
-        "De acuerdo con lo establecido en el articulo 25.5 de la ley 43/2003 de 21 de noviembre de Montes, para posibilitar el ejercicio del derecho de adquisicion preferente a traves de la accion de tanteo, el transmitente debera notificar fehacientemente a la Administracion publica titular de ese derecho los datos relativos al precio y caracteristicas de la transmision proyectada, la cual dispondra de un plazo de tres meses, a partir de dicha notificacion, para ejercitar dicho derecho, mediante el abono o consignacion de su importe en las referidas condiciones.\n\n"
-        "En relacion al Dominio Publico Pecuario, salvaguardando lo que pudiera resultar de los futuros deslindes, en la parcela objeto este informe, cualquier construccion, plantacion, vallado, obras, instalaciones, etc., no deberian realizarse dentro del area delimitada como Dominio Publico Pecuario provisional para evitar invadir este.\n\n"
+        "\nLas afecciones del presente informe se basan en cartografía oficial de la Comunidad Autónoma y de la Dirección General del Catastro, cumpliendo el estándar técnico Web Feature Service (WFS) definido por el Open Geospatial Consortium (OGC) y la Directiva INSPIRE, eximiendo a IBERIA FORESTAL INGENIERÍA S.L de cualquier error en la cartografía.\n\n"
+        "El Planeamiento se regirá por la Ley 9/2001, de 17 de julio, del Suelo, de la Comunidad de Madrid, y por el PGOU del termino municipal. El Régimen del suelo no urbanizable de protección se recoge en el artículo 29 de la citada Ley.\n\n"
+        "En suelo no urbanizable se prestara especial atención a la definición de monte dada en el artículo 3 de la Ley 16/1995, de 4 de mayo, Forestal y de Protección de la Naturaleza de la Comunidad de Madrid, y artículo 5 de la Ley 43/2003, de 21 de noviembre, de Montes. Solicitando para posibles cambios de uso lo establecido en la normativa de referencia.\n\n"
+        "De acuerdo con lo establecido en el artículo 22.1 de la ley 43/2003 de 21 de noviembre de Montes, toda inmatriculación o inscripción de exceso de cabida en el Registro de la Propiedad de un monte o de una finca colindante con monte demanial o ubicado en un término municipal en el que existan montes demaniales requerirá el previo informe favorable de los titulares de dichos montes y, para los montes catalogados, el del órgano forestal de la Comunidad Autónoma.\n\n"
+        "De acuerdo con lo establecido en el artículo 25.5 de la ley 43/2003 de 21 de noviembre de Montes, para posibilitar el ejercicio del derecho de adquisición preferente a través de la acción de tanteo, el transmitente deberá notificar fehacientemente a la Administración pública titular de ese derecho los datos relativos al precio y características de la transmisión proyectada, la cual dispondrá de un plazo de tres meses, a partir de dicha notificación, para ejercitar dicho derecho, mediante el abono o consignación de su importe en las referidas condiciones.\n\n"
+        "En relación al Dominio Público Pecuario, salvaguardando lo que pudiera resultar de los futuros deslindes, en la parcela objeto este informe, cualquier construcción, plantación, vallado, obras, instalaciones, etc., no deberían realizarse dentro del área delimitada como Dominio Público Pecuario provisional para evitar invadir este.\n\n"
         "En todo caso, no podrá interrumpirse el tránsito por las Vías Pecuarias, dejando siempre el paso adecuado para el tránsito ganadero y otros usos legalmente establecidos en la Ley 3/1995, de 23 de marzo, de Vías Pecuarias."
     )
     pdf.multi_cell(190, 5, texto_final, border=0, align="J")
