@@ -548,45 +548,6 @@ def hay_espacio_suficiente(pdf, altura_necesaria, margen_inferior=20):
     espacio_disponible = pdf.h - pdf.get_y() - margen_inferior
     return espacio_disponible >= altura_necesaria
 
-# ==================================================================
-# NUEVA FUNCIÓN: Convertir mapa Folium bonito en PNG para el PDF
-# ==================================================================
-import selenium
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import time
-
-def mapa_folium_a_png(mapa_html_path, png_path, zoom=17, width=1100, height=750, delay=7):
-    """
-    Genera una captura de alta calidad del mapa Folium (el mismo que ve el usuario)
-    """
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument(f"--window-size={width},{height}")
-
-    driver = webdriver.Chrome(options=options)
-    
-    try:
-        file_url = f"file://{os.path.abspath(mapa_html_path)}"
-        driver.get(file_url)
-        time.sleep(delay)  # espera a que carguen todas las capas WMS
-        
-        # Aseguramos zoom y centrado perfecto
-        driver.execute_script(f"if (map) {{ map.setZoom({zoom}); }}")
-        time.sleep(1)
-        
-        driver.save_screenshot(png_path)
-        return png_path
-    except Exception as e:
-        st.warning(f"No se pudo capturar el mapa bonito: {e}")
-        return None
-    finally:
-        driver.quit()
-
 def generar_pdf(datos, x, y, filename):
     logo_path = "logos.jpg"
 
