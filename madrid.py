@@ -1457,7 +1457,7 @@ def generar_pdf(datos, x, y, filename):
             pdf.add_page()
     
         pdf.set_font("Arial", "B", 11)
-        pdf.cell(0, 5, "Afecciones a Zonas con Contaminación de Nitratos:", ln=True)
+        pdf.cell(0, 5, "Afecciones a Contaminación por Nitratos:", ln=True)
         pdf.ln(2)
     
         col_w_code = 30
@@ -1510,7 +1510,7 @@ def generar_pdf(datos, x, y, filename):
             # Mover a la siguiente fila
             pdf.set_y(y + row_h)
     
-        pdf.ln(5)   
+        pdf.ln(5)    
          
     # Nueva sección para el texto en cuadro
     # Procedimientos sin negrita
