@@ -723,7 +723,7 @@ def generar_pdf(datos, x, y, filename):
     enp_detectado = []
     enp_valor = procesar_capa(
         enp_url, "afección ENP", "No afecta a ningún Espacio Natural Protegido",
-        ["DS_NOMBRE", "DS_FIGURA"],
+        ["DS_FIGURA", "DS_NOMBRE"],
         enp_detectado
     )
 
