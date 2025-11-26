@@ -1840,7 +1840,8 @@ if submitted:
                 'corredores': corredores_url,
                 'uso_suelo': uso_suelo_url,
                 'humedales': humedales_url,
-                'biosfera': biosfera_url
+                'biosfera': biosfera_url,
+                'nitratos': nitratos_url
             }
 
             # === 6. CONSULTAR AFECCIONES ===
