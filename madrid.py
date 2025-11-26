@@ -676,7 +676,7 @@ def generar_pdf(datos, x, y, filename):
         
 # === PROCESAR TODAS LAS CAPAS ===
     def procesar_capa(url, key, valor_inicial, campos, detectado_list):
-        valor = datos.get(key, "").strip()
+        valor = (datos.get(key) or "").strip()
         if valor and not valor.startswith("No afecta") and not valor.startswith("Error"):
             try:
                 data = _descargar_geojson(url)
