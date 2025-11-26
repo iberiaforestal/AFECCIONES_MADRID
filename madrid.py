@@ -676,7 +676,16 @@ def generar_pdf(datos, x, y, filename):
         
 # === PROCESAR TODAS LAS CAPAS ===
     def procesar_capa(url, key, valor_inicial, campos, detectado_list):
-        valor = (datos.get(key) or "").strip()
+        # Evitar None antes de .strip()
+        valor_raw = datos.get(key)
+        valor = (str(valor_raw) if valor_raw is not None else "").strip()
+    
+        # Si no hay URL, no intentamos descargar nada (evita pasar None a requests/geopandas)
+        if not url:
+            # Si ya hay detecciones, devolvemos cadena vacía (ya se completó)
+            return "" if detectado_list else valor_inicial
+    
+        # Solo consultamos si el valor indica que debería consultarse (evita errores)
         if valor and not valor.startswith("No afecta") and not valor.startswith("Error"):
             try:
                 data = _descargar_geojson(url)
@@ -691,8 +700,10 @@ def generar_pdf(datos, x, y, filename):
                     return ""
                 return valor_inicial
             except Exception as e:
+                # Mostrar detalle para depuración (puedes quitar el str(e) largo luego)
                 st.error(f"Error al procesar {key}: {e}")
                 return "Error al consultar"
+        # Si no hay valor y no hay detecciones devolver el valor inicial
         return valor_inicial if not detectado_list else ""
 
     # === VP ===
