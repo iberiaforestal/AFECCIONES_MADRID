@@ -403,7 +403,7 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
     }
     
     for name, (servicio, layer) in capas.items():
-        url = f"https://idem.comunidad.madrid/geoidem/ows?SERVICE=WMS&?"
+        url = f"https://idem.comunidad.madrid/geoidem/ows?"
         try:
             folium.raster_layers.WmsTileLayer(
                 name=name,
