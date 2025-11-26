@@ -499,7 +499,7 @@ class CustomPDF(FPDF):
                 # --- ÁREA IMPRIMIBLE (SIN MÁRGENES) ---
                 available_width = self.w - self.l_margin - self.r_margin  # ¡CORRECTO!
 
-                max_logo_height = 25  # Altura fija
+                max_logo_height = 16  # ← tamaño reducido (prueba 16-20)
 
                 from PIL import Image
                 img = Image.open(self.logo_path)
@@ -514,8 +514,8 @@ class CustomPDF(FPDF):
                     target_width = target_height * ratio
 
                 # --- CENTRAR DENTRO DEL ÁREA IMPRIMIBLE ---
-                x = self.l_margin + 5
-                y = 8
+                x = self.l_margin + 5 # a la izquierda
+                y = 8 # 8 mm desde arriba
 
                 self.image(self.logo_path, x=x, y=y, w=target_width, h=target_height)
                 self.set_y(y + target_height + 3)
