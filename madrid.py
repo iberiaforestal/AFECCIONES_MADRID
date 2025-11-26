@@ -417,41 +417,6 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
         except Exception as e:
             st.error(f"Error cargando WMS {nombre}: {str(e)}")
 
-    for name, url, style_cfg in arcgis_layers:
-
-        # Bounding box pequeño alrededor del punto
-        delta = 0.02  # unos ±2 km (ajustable)
-        
-        bbox = f"{lon-delta},{lat-delta},{lon+delta},{lat+delta}"
-        
-        geojson_url = (
-            f"{url}/query?"
-            f"geometry={bbox}&geometryType=esriGeometryEnvelope"
-            f"&spatialRel=esriSpatialRelIntersects"
-            f"&outFields=*&f=geojson"
-        )
-
-        try:
-            response = requests.get(geojson_url)
-            response.raise_for_status()
-            data = response.json()
-
-            folium.GeoJson(
-                data,
-                name=name,
-                style_function=lambda x, cfg=style_cfg: {
-                    "color": cfg["color"],
-                    "weight": 2,
-                    "fillColor": cfg["fillColor"],
-                    "fillOpacity": 0.3
-                }
-            ).add_to(m)
-
-        except Exception as e:
-            st.error(f"Error al cargar la capa {name}: {str(e)}")
-
-    folium.LayerControl().add_to(m)
-
     # ===============================
     # LEYENDA
     # ===============================
