@@ -446,7 +446,7 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
             <span style="display:inline-block;width:20px;height:20px;background:#FF00FF;border:1px solid #8B008B;"></span>
             Montes Utilidad Pública<br>
 
-            <span style="display:inline-block;width:20px;height:20px;background:#87CEFA;border:1px solid #FF8C00;"></span>
+            <span style="display:inline-block;width:20px;height:20px;background:#FFA500;border:1px solid #FF8C00;"></span>
             Vías Pecuarias<br>
         </div>
     </div>
