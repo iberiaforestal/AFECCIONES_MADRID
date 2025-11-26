@@ -1848,7 +1848,7 @@ if submitted:
             afeccion_corredores = consultar_wfs_seguro(query_geom, corredores_url, "CORREDOR", campo_nombre="DS_TIPO_CORREDOR")
             afeccion_humedales = consultar_wfs_seguro(query_geom, humedales_url, "HUMEDALES", campo_nombre="DS_ZONA")
             afeccion_biosfera = consultar_wfs_seguro(query_geom, biosfera_url, "BIOESFERA", campo_nombre="CD_RESERVA")
-            afeccion_nitratos = consultar_wfs_seguro(query_geom, nitratos_url, "NATRATOS", campo_nombre="CD_ZONA")           
+            afeccion_nitratos = consultar_wfs_seguro(query_geom, nitratos_url, "NATRATOS", campo_nombre="DS_DESCRIPCIO")           
             afeccion_uso_suelo = consultar_wfs_seguro(query_geom, uso_suelo_url, "PLANEAMIENTO", campo_nombre="DS_CLASI")            
             afeccion_enp = consultar_wfs_seguro(query_geom, enp_url, "ENP", campo_nombre="DS_NOMBRE")
             afeccion_zepa = consultar_wfs_seguro(query_geom, zepa_url, "ZEPA", campo_nombre="DS_ZEPA")
