@@ -562,7 +562,7 @@ def generar_pdf(datos, x, y, filename):
         )
         logo_path = None
     else:
-        st.success("Logo local cargado correctamente")
+        pass
 
     # === RECUPERAR query_geom ===
     query_geom = st.session_state.get('query_geom')
