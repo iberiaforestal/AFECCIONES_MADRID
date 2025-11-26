@@ -514,8 +514,8 @@ class CustomPDF(FPDF):
                     target_width = target_height * ratio
 
                 # --- CENTRAR DENTRO DEL ÁREA IMPRIMIBLE ---
-                x = self.l_margin + (available_width - target_width) / 2
-                y = 5
+                x = self.l_margin + 5
+                y = 8
 
                 self.image(self.logo_path, x=x, y=y, w=target_width, h=target_height)
                 self.set_y(y + target_height + 3)
