@@ -1874,7 +1874,7 @@ if submitted:
                 "afección biosfera": afeccion_biosfera,
                 "afección nitratos": afeccion_nitratos,
                 "coordenadas_x": x, "coordenadas_y": y,
-                "municipio": municipio_sel, "polígono": masa_sel, "parcela": parcela_sel
+                "municipio": municipio_sel, "polígono": masa_sel, "parcela": parcela_sel 
             }
 
             # === 8. MOSTRAR RESULTADOS EN PANTALLA ===
