@@ -235,7 +235,7 @@ def cargar_shapefile_desde_github(municipio_file):
     with tempfile.TemporaryDirectory() as tmpdir:
         local_paths = {}
         for ext in exts:
-            url = f"{base_url}{ext}"
+            url = f"{base_url}{municipio_file}{ext}"
             try:
                 response = session.get(url, timeout=60)  # usamos tu session con reintentos
                 response.raise_for_status()
