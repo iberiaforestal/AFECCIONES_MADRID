@@ -417,6 +417,8 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
         except Exception as e:
             st.error(f"Error al cargar la capa WMS {name}: {str(e)}")
 
+    folium.LayerControl().add_to(m)
+
     # ===============================
     # LEYENDA
     # ===============================
