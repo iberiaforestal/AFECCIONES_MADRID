@@ -403,19 +403,18 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
     }
     
     for nombre, (servicio, layer) in capas.items():
-        url = f"https://idem.comunidad.madrid/geoidem/{servicio}/wms?"
+        url = f"https://idem.comunidad.madrid/geoidem/ows?SERVICE=WMS&?"
         try:
             folium.raster_layers.WmsTileLayer(
-                url=url,
-                name=nombre,
-                layers=layer,
+                name=name,
                 fmt="image/png",
+                layers=layer,
                 transparent=True,
                 opacity=0.25,
                 control=True
             ).add_to(m)
         except Exception as e:
-            st.error(f"Error cargando WMS {nombre}: {str(e)}")
+            st.error(f"Error al cargar la capa WMS {name}: {str(e)}")
 
     # ===============================
     # LEYENDA
