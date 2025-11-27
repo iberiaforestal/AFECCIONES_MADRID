@@ -1636,7 +1636,7 @@ def generar_pdf(datos, x, y, filename):
     return filename
 
 # Interfaz de Streamlit
-st.image(Image.open(logo_path), width=250)
+st.image(Image.open("/home/ubuntu/informes/comunidades/Madrid/logos.jpg"), width=250)
 
 st.title("Informe basico de Afecciones al Medio Natural")
 
