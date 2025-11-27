@@ -230,39 +230,19 @@ shp_urls = {
 # Función para cargar shapefiles desde VPS
 @st.cache_data(ttl=86400, show_spinner=False)
 def cargar_shapefile_local(municipio_file):
-    # Normalizamos el nombre del municipio
     municipio_file_normalizado = normalize_name(municipio_file)
-
-    # RUTA MÁGICA: funciona en local y en Docker, y para cualquier comunidad
-    # __file__ es el propio madrid.py → subimos dos niveles → llegamos a /app/comunidades/Madrid
-    current_dir = Path(__file__).parent.resolve()                    # /app/comunidades/Madrid
-    base_path = current_dir / "CATASTRO" / municipio_file_normalizado
-
-    exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
-
+    base_path = Path("/app/comunidades/Madrid/CATASTRO") / municipio_file_normalizado
+    
     if not base_path.exists():
-        st.error(f"No existe el directorio: {base_path}")
+        st.error(f"No existe: {base_path}")
         return None
-
-    local_paths = {}
-    for ext in exts:
-        file_path = base_path / f"{municipio_file_normalizado}{ext}"
-        if file_path.exists():
-            local_paths[ext] = str(file_path)
-
-    # Los esenciales
-    for ext in [".shp", ".shx", ".dbf"]:
-        if ext not in local_paths:
-            st.error(f"Falta el archivo {municipio_file_normalizado}{ext} en {base_path}")
-            return None
-
-    # Cargar
+    
+    shp_file = base_path / f"{municipio_file_normalizado}.shp"
     try:
-        gdf = gpd.read_file(local_paths[".shp"])
-        gdf = gdf.to_crs(epsg=25830)
-        return gdf
+        gdf = gpd.read_file(shp_file)
+        return gdf.to_crs(epsg=25830)
     except Exception as e:
-        st.error(f"Error al leer shapefile local ({municipio_file_normalizado}): {e}")
+        st.error(f"Error leyendo {municipio_file_normalizado}: {e}")
         return None
             
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
