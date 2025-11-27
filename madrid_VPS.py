@@ -227,44 +227,43 @@ shp_urls = {
 
 }
 
-# Función para cargar shapefiles desde GitHub
+# Función para cargar shapefiles desde VPS
 @st.cache_data(ttl=86400, show_spinner=False)
-def cargar_shapefile_desde_github(municipio_file):
-    base_url = f"https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/CATASTRO/{municipio_file}/"
-    base_url = base_url.replace(" ", "%20")
-    exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
-    
-    with tempfile.TemporaryDirectory() as tmpdir:
-        local_paths = {}
-        for ext in exts:
-            url = f"{base_url}{municipio_file}{ext}"
-            try:
-                response = session.get(url, timeout=60)  # usamos tu session con reintentos
-                response.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                st.error(f"Error al descargar {url}: {str(e)}")
-                return None
-           
-            local_path = os.path.join(tmpdir, municipio_file + ext)
-            with open(local_path, "wb") as f:
-                f.write(response.content)
-            local_paths[ext] = local_path
-       
-        shp_path = local_paths[".shp"]
-        try:
-            gdf = gpd.read_file(shp_path, encoding="cp1252")
-            gdf = gdf.to_crs(epsg=25830)  # aseguramos ETRS89 UTM 30N
-            return gdf
-        except Exception as e:
-            st.error(f"Error al leer shapefile: {str(e)}")
+def cargar_shapefile_local(municipio_file):
+    """
+    Lee el .shp desde:
+    /home/ubuntu/informes/comunidades/Madrid/CATASTRO/<municipio_file>/
+    """
+    base_path = f"/home/ubuntu/informes/comunidades/Madrid/CATASTRO/{municipio_file}"
+    try:
+        if not os.path.isdir(base_path):
+            st.error(f"No existe el directorio: {base_path}")
             return None
+
+        # Buscar cualquier .shp dentro de la carpeta (por si hay varios)
+        shp_files = [f for f in os.listdir(base_path) if f.lower().endswith(".shp")]
+        if not shp_files:
+            st.error(f"No se encontró archivo .shp en {base_path}")
+            return None
+
+        # Si hay varios, tomamos el primero (podemos cambiar esto si quieres lógica distinta)
+        shp_path = os.path.join(base_path, shp_files[0])
+
+        gdf = gpd.read_file(shp_path, encoding="cp1252")
+        # Normalizar CRS a ETRS89 / UTM zone 30N (25830)
+        gdf = gdf.to_crs(epsg=25830)
+        return gdf
+
+    except Exception as e:
+        st.error(f"Error al leer shapefile local ({municipio_file}): {e}")
+        return None
             
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
 def encontrar_municipio_poligono_parcela(x, y):
     try:
         punto = Point(x, y)
         for municipio, archivo_base in shp_urls.items():
-            gdf = cargar_shapefile_desde_github(archivo_base)
+            gdf = cargar_shapefile_local(archivo_base)
             if gdf is None:
                 continue
             seleccion = gdf[gdf.contains(punto)]
@@ -553,16 +552,11 @@ def hay_espacio_suficiente(pdf, altura_necesaria, margen_inferior=20):
     return espacio_disponible >= altura_necesaria
 
 def generar_pdf(datos, x, y, filename):
-    logo_path = "logos.jpg"
+    logo_path = "/home/ubuntu/informes/comunidades/Madrid/logos.jpg"
 
     if not os.path.exists(logo_path):
-        st.error("FALTA EL ARCHIVO: 'logos.jpg' en la raíz del proyecto.")
-        st.markdown(
-            "Descárgalo aquí: [logos.jpg](https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg)"
-        )
+        st.error(f"No se encontró el archivo del logo en: {logo_path}")
         logo_path = None
-    else:
-        pass
 
     # === RECUPERAR query_geom ===
     query_geom = st.session_state.get('query_geom')
@@ -1643,7 +1637,7 @@ def generar_pdf(datos, x, y, filename):
 
 # Interfaz de Streamlit
 st.image(
-    "https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg",
+    "/home/ubuntu/informes/comunidades/Madrid/logos.jpg",
     width=250 # ← más pequeño (prueba 160-200)
 )
 st.title("Informe basico de Afecciones al Medio Natural")
@@ -1661,7 +1655,7 @@ if modo == "Por parcela":
     municipio_sel = st.selectbox("Municipio", sorted(shp_urls.keys()))
     archivo_base = shp_urls[municipio_sel]
     
-    gdf = cargar_shapefile_desde_github(archivo_base)
+    gdf = cargar_shapefile_local(archivo_base)
     
     if gdf is not None:
         masa_sel = st.selectbox("Polígono", sorted(gdf["MASA"].unique()))
