@@ -235,7 +235,7 @@ def cargar_shapefile_local(municipio_file):
     base_path = f"/home/ubuntu/informes/comunidades/Madrid/CATASTRO/{municipio_file_normalizado}"
     exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
 
-    print("DEBUG municipio recibido:", repr(municipio))
+    print("DEBUG archivo_base recibido:", repr(archivo_base))
     print("DEBUG base_path construido:", repr(base_path))
     # Comprobamos que el directorio exista
     if not os.path.isdir(base_path):
