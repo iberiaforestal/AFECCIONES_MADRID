@@ -230,11 +230,10 @@ shp_urls = {
 # Función para cargar shapefiles desde VPS
 @st.cache_data(ttl=86400, show_spinner=False)
 def cargar_shapefile_local(municipio_file):
-    base_path = f"/home/ubuntu/informes/comunidades/Madrid/CATASTRO/{municipio_file}"
+    # Normalizamos el nombre del municipio
+    municipio_file_normalizado = normalize_name(municipio_file)
+    base_path = f"/home/ubuntu/informes/comunidades/Madrid/CATASTRO/{municipio_file_normalizado}"
     exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
-
-    # Normalizamos por si hay espacios alrededor
-    municipio_file = municipio_file.strip()
 
     # Comprobamos que el directorio exista
     if not os.path.isdir(base_path):
@@ -244,14 +243,14 @@ def cargar_shapefile_local(municipio_file):
     # Verificamos presencia de archivos
     local_paths = {}
     for ext in exts:
-        file_path = os.path.join(base_path, municipio_file + ext)
+        file_path = os.path.join(base_path, municipio_file_normalizado + ext)
         if os.path.exists(file_path):
             local_paths[ext] = file_path
 
     # Los archivos esenciales
     for ext in [".shp", ".shx", ".dbf"]:
         if ext not in local_paths:
-            st.error(f"Falta el archivo {municipio_file}{ext} en {base_path}")
+            st.error(f"Falta el archivo {municipio_file_normalizado}{ext} en {base_path}")
             return None
 
     # Cargar shapefile
@@ -262,8 +261,8 @@ def cargar_shapefile_local(municipio_file):
         gdf = gdf.to_crs(epsg=25830)  # Normalizamos CRS
         return gdf
     except Exception as e:
-        st.error(f"Error al leer shapefile local ({municipio_file}): {e}")
-        return None   
+        st.error(f"Error al leer shapefile local ({municipio_file_normalizado}): {e}")
+        return None
             
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
 def encontrar_municipio_poligono_parcela(x, y):
