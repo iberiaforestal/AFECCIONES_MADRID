@@ -230,33 +230,40 @@ shp_urls = {
 # Función para cargar shapefiles desde VPS
 @st.cache_data(ttl=86400, show_spinner=False)
 def cargar_shapefile_local(municipio_file):
-    """
-    Lee el .shp desde:
-    /home/ubuntu/informes/comunidades/Madrid/CATASTRO/<municipio_file>/
-    """
     base_path = f"/home/ubuntu/informes/comunidades/Madrid/CATASTRO/{municipio_file}"
+    exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
+
+    # Normalizamos por si hay espacios alrededor
+    municipio_file = municipio_file.strip()
+
+    # Comprobamos que el directorio exista
+    if not os.path.isdir(base_path):
+        st.error(f"No existe el directorio: {base_path}")
+        return None
+
+    # Verificamos presencia de archivos
+    local_paths = {}
+    for ext in exts:
+        file_path = os.path.join(base_path, municipio_file + ext)
+        if os.path.exists(file_path):
+            local_paths[ext] = file_path
+
+    # Los archivos esenciales
+    for ext in [".shp", ".shx", ".dbf"]:
+        if ext not in local_paths:
+            st.error(f"Falta el archivo {municipio_file}{ext} en {base_path}")
+            return None
+
+    # Cargar shapefile
+    shp_path = local_paths[".shp"]
+
     try:
-        if not os.path.isdir(base_path):
-            st.error(f"No existe el directorio: {base_path}")
-            return None
-
-        # Buscar cualquier .shp dentro de la carpeta (por si hay varios)
-        shp_files = [f for f in os.listdir(base_path) if f.lower().endswith(".shp")]
-        if not shp_files:
-            st.error(f"No se encontró archivo .shp en {base_path}")
-            return None
-
-        # Si hay varios, tomamos el primero (podemos cambiar esto si quieres lógica distinta)
-        shp_path = os.path.join(base_path, shp_files[0])
-
-        gdf = gpd.read_file(shp_path, encoding="cp1252")
-        # Normalizar CRS a ETRS89 / UTM zone 30N (25830)
-        gdf = gdf.to_crs(epsg=25830)
+        gdf = gpd.read_file(shp_path)
+        gdf = gdf.to_crs(epsg=25830)  # Normalizamos CRS
         return gdf
-
     except Exception as e:
         st.error(f"Error al leer shapefile local ({municipio_file}): {e}")
-        return None
+        return None   
             
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
 def encontrar_municipio_poligono_parcela(x, y):
