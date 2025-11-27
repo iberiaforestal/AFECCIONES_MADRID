@@ -552,7 +552,7 @@ def hay_espacio_suficiente(pdf, altura_necesaria, margen_inferior=20):
     return espacio_disponible >= altura_necesaria
 
 def generar_pdf(datos, x, y, filename):
-    logo_path = "/home/ubuntu/informes/logos.jpg"
+    logo_path = "/home/ubuntu/informes/comunidades/Madrid/logos.jpg"
 
     if not os.path.exists(logo_path):
         st.error(f"No se encontró el archivo del logo en: {logo_path}")
@@ -1636,7 +1636,7 @@ def generar_pdf(datos, x, y, filename):
     return filename
 
 # Interfaz de Streamlit
-st.image(Image.open("/home/ubuntu/informes/logos.jpg"), width=250)
+st.image("logos.jpg", width=250)
 
 st.title("Informe basico de Afecciones al Medio Natural")
 
