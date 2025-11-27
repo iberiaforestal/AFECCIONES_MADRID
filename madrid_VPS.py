@@ -236,7 +236,8 @@ def cargar_shapefile_local(municipio_file):
     exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
 
     print("DEBUG base_path construido:", repr(base_path))
-    print("DEBUG contenido del directorio padre:", os.listdir(os.path.dirname(base_path)))
+    print("DEBUG padre existe:", os.path.isdir(os.path.dirname(base_path)))
+    print("DEBUG base_path existe:", os.path.isdir(base_path))
     # Comprobamos que el directorio exista
     if not os.path.isdir(base_path):
         st.error(f"No existe el directorio: {base_path}")
