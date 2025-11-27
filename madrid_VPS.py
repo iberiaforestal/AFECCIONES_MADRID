@@ -231,7 +231,7 @@ shp_urls = {
 @st.cache_data(ttl=86400, show_spinner=False)
 def cargar_shapefile_local(municipio_file):
     municipio_file_normalizado = normalize_name(municipio_file)
-    base_path = Path("/app/comunidades/Madrid/CATASTRO") / municipio_file_normalizado
+    base_path = Path(__file__).parent / "CATASTRO" / municipio_file_normalizado
     
     if not base_path.exists():
         st.error(f"No existe: {base_path}")
@@ -1623,7 +1623,7 @@ def generar_pdf(datos, x, y, filename):
     return filename
 
 # Interfaz de Streamlit
-st.image("logos.jpg", width=250)
+st.image("/app/logos.jpg", width=250)
 
 st.title("Informe basico de Afecciones al Medio Natural")
 
