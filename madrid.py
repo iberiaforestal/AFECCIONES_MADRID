@@ -1521,6 +1521,7 @@ def generar_pdf(datos, x, y, filename):
          
     # Nueva sección para el texto en cuadro
     # Procedimientos sin negrita
+    pdf.showPage()
     pdf.set_font("Arial", "", 8)  # Fuente normal para los procedimientos
     procedimientos_con_enlace = [
         ("70090", "Presentación de escritos y comunicaciones. Formulario genérico.", "https://sede.comunidad.madrid/prestacion-social/formulario-solicitud-generica"),        
