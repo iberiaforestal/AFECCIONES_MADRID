@@ -230,34 +230,23 @@ shp_urls = {
 # Función para cargar shapefiles desde GitHub
 @st.cache_data(ttl=86400, show_spinner=False)
 def cargar_shapefile_desde_github(municipio_file):
-    base_url = f"https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/CATASTRO/{municipio_file}/"
-    base_url = base_url.replace(" ", "%20")
-    exts = [".shp", ".shx", ".dbf", ".prj", ".cpg"]
+    base_path = "/home/ubuntu/informes/comunidades/Madrid/CATASTRO"
+    municipio_path = os.path.join(base_path, municipio_file)
     
-    with tempfile.TemporaryDirectory() as tmpdir:
-        local_paths = {}
-        for ext in exts:
-            url = f"{base_url}{municipio_file}{ext}"
+    if not os.path.exists(municipio_path):
+        return None
+    
+    for file in os.listdir(municipio_path):
+        if file.endswith('.shp'):
+            shp_path = os.path.join(municipio_path, file)
             try:
-                response = session.get(url, timeout=60)  # usamos tu session con reintentos
-                response.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                st.error(f"Error al descargar {url}: {str(e)}")
-                return None
-           
-            local_path = os.path.join(tmpdir, municipio_file + ext)
-            with open(local_path, "wb") as f:
-                f.write(response.content)
-            local_paths[ext] = local_path
-       
-        shp_path = local_paths[".shp"]
-        try:
-            gdf = gpd.read_file(shp_path, encoding="cp1252")
-            gdf = gdf.to_crs(epsg=25830)  # aseguramos ETRS89 UTM 30N
-            return gdf
-        except Exception as e:
-            st.error(f"Error al leer shapefile: {str(e)}")
-            return None
+                gdf = gpd.read_file(shp_path, encoding="cp1252")
+                gdf = gdf.to_crs(epsg=25830)
+                return gdf
+            except:
+                continue
+    
+    return None
             
 # Función para encontrar municipio, polígono y parcela a partir de coordenadas
 def encontrar_municipio_poligono_parcela(x, y):
@@ -282,7 +271,7 @@ def encontrar_municipio_poligono_parcela(x, y):
 def transformar_coordenadas(x, y):
     try:
         x, y = float(x), float(y)
-        if not (380000 <= x <= 510000 and 4430000 <= 4535000):
+        if not (380000 <= x <= 510000 and 4430000 <= y <= 4535000):
             st.error("Coordenadas fuera del rango esperado para ETRS89 UTM Zona 30")
             return None, None
         transformer = Transformer.from_crs("EPSG:25830", "EPSG:4326", always_xy=True)
@@ -557,9 +546,7 @@ def generar_pdf(datos, x, y, filename):
 
     if not os.path.exists(logo_path):
         st.error("FALTA EL ARCHIVO: 'logos.jpg' en la raíz del proyecto.")
-        st.markdown(
-            "Descárgalo aquí: [logos.jpg](https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg)"
-        )
+        st.markdown("Logo local: logos.jpg")
         logo_path = None
     else:
         pass
@@ -1642,10 +1629,8 @@ def generar_pdf(datos, x, y, filename):
     return filename
 
 # Interfaz de Streamlit
-st.image(
-    "https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg",
-    width=250 # ← más pequeño (prueba 160-200)
-)
+st.image("logos.jpg",width=250) # ← más pequeño (prueba 160-200)
+
 st.title("Informe basico de Afecciones al Medio Natural")
 
 modo = st.radio("Seleccione el modo de búsqueda. Recuerde que la busqueda por parcela analiza afecciones al total de la superficie de la parcela, por el contrario la busqueda por coodenadas analiza las afecciones del punto", ["Por coordenadas", "Por parcela"])
