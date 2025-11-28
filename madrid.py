@@ -1648,7 +1648,7 @@ st.image(
     "https://raw.githubusercontent.com/iberiaforestal/AFECCIONES_MADRID/master/logos.jpg",
     width=250 # ← más pequeño (prueba 160-200)
 )
-st.title("Informe basico de Afecciones al Medio Natural")
+st.title("Informe Básico de Afecciones al Medio Natural")
 
 modo = st.radio("Seleccione el modo de búsqueda. Recuerde que la busqueda por parcela analiza afecciones al total de la superficie de la parcela, por el contrario la busqueda por coodenadas analiza las afecciones del punto", ["Por coordenadas", "Por parcela"])
 
@@ -1686,7 +1686,7 @@ if modo == "Por parcela":
 
 with st.form("formulario"):
     if modo == "Por coordenadas":
-        x = st.number_input("Coordenada X (ETRS89)", format="%.2f", help="Introduce coordenadas en metros, sistema ETRS89 / UTM zona 30")
+        x = st.number_input("Coordenada X (ETRS89)", format="%.2f", help="Introduce coordenadas en metros, sistema ETRS89")
         y = st.number_input("Coordenada Y (ETRS89)", format="%.2f")
         if x != 0.0 and y != 0.0:
             municipio_sel, masa_sel, parcela_sel, parcela = encontrar_municipio_poligono_parcela(x, y)
