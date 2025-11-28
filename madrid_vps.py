@@ -1606,7 +1606,7 @@ def generar_pdf(datos, x, y, filename):
     pdf.set_font("Arial", "B", 9)  # Restaurar negrita
     texto_final = (
         "\nLas afecciones del presente informe se basan en cartografía oficial de la Comunidad Autónoma y de la Dirección General del Catastro, cumpliendo el estándar técnico Web Feature Service (WFS) definido por el Open Geospatial Consortium (OGC) y la Directiva INSPIRE, eximiendo a IBERIA FORESTAL INGENIERÍA S.L de cualquier error en la cartografía.\n\n"
-        "El Planeamiento se regirá por la Ley 9/2001, de 17 de julio, del Suelo, de la Comunidad de Madrid, y por el PGOU del termino municipal. El Régimen del suelo no urbanizable de protección se recoge en el artículo 29 de la citada Ley.\n\n"
+        "El Planeamiento se regirá por la Ley 9/2001, de 17 de julio, del Suelo, de la Comunidad de Madrid, y por el PGOU del término municipal. El Régimen del suelo no urbanizable de protección se recoge en el artículo 29 de la citada Ley.\n\n"
         "En suelo no urbanizable se prestara especial atención a la definición de monte dada en el artículo 3 de la Ley 16/1995, de 4 de mayo, Forestal y de Protección de la Naturaleza de la Comunidad de Madrid, y artículo 5 de la Ley 43/2003, de 21 de noviembre, de Montes. Solicitando para posibles cambios de uso lo establecido en la normativa de referencia.\n\n"
         "De acuerdo con lo establecido en el artículo 22.1 de la ley 43/2003 de 21 de noviembre de Montes, toda inmatriculación o inscripción de exceso de cabida en el Registro de la Propiedad de un monte o de una finca colindante con monte demanial o ubicado en un término municipal en el que existan montes demaniales requerirá el previo informe favorable de los titulares de dichos montes y, para los montes catalogados, el del órgano forestal de la Comunidad Autónoma.\n\n"
         "De acuerdo con lo establecido en el artículo 25.5 de la ley 43/2003 de 21 de noviembre de Montes, para posibilitar el ejercicio del derecho de adquisición preferente a través de la acción de tanteo, el transmitente deberá notificar fehacientemente a la Administración pública titular de ese derecho los datos relativos al precio y características de la transmisión proyectada, la cual dispondrá de un plazo de tres meses, a partir de dicha notificación, para ejercitar dicho derecho, mediante el abono o consignación de su importe en las referidas condiciones.\n\n"
@@ -1669,7 +1669,7 @@ if modo == "Por parcela":
 
 with st.form("formulario"):
     if modo == "Por coordenadas":
-        x = st.number_input("Coordenada X (ETRS89)", format="%.2f", help="Introduce coordenadas en metros, sistema ETRS89 / UTM zona 30")
+        x = st.number_input("Coordenada X (ETRS89)", format="%.2f", help="Introduce coordenadas en metros, sistema ETRS89")
         y = st.number_input("Coordenada Y (ETRS89)", format="%.2f")
         if x != 0.0 and y != 0.0:
             municipio_sel, masa_sel, parcela_sel, parcela = encontrar_municipio_poligono_parcela(x, y)
