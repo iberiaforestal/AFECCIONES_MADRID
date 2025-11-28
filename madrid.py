@@ -636,10 +636,12 @@ def generar_pdf(datos, x, y, filename):
     pdf.ln(2)
     pdf.set_font("Arial", "B", 11)
     pdf.cell(0, 7, "Objeto de la solicitud:", ln=True)
+    
     pdf.set_font("Arial", "", 11)
-    wrapped_objeto = textwrap.wrap(objeto if objeto else "No especificado", width=60)
-    for line in wrapped_objeto:
-        pdf.cell(0, 7, line, ln=1)
+    texto_objeto = datos.get("objeto de la solicitud", "").strip() or "No especificado"
+    
+    pdf.multi_cell(w=190, h=7, txt=texto_objeto, align='J')
+    pdf.ln(6)
         
     seccion_titulo("2. Localización")
     for campo in ["municipio", "polígono", "parcela"]:
