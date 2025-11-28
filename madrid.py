@@ -633,13 +633,20 @@ def generar_pdf(datos, x, y, filename):
         campo_orden(pdf, titulo, valor)
 
     objeto = datos.get("objeto de la solicitud", "").strip()
-    pdf.ln(2)
+    pdf.ln(2)                                      # Espacio antes del título
     pdf.set_font("Arial", "B", 11)
     pdf.cell(0, 7, "Objeto de la solicitud:", ln=True)
+    
     pdf.set_font("Arial", "", 11)
-    wrapped_objeto = textwrap.wrap(objeto if objeto else "No especificado", width=60)
-    for line in wrapped_objeto:
-        pdf.cell(0, 7, line, ln=1)
+    
+    objeto = datos.get("objeto de la solicitud", "").strip()
+    
+    if objeto:
+        pdf.multi_cell(w=190, h=7, txt=objeto, border=0, align='J')  # Justificado
+    else:
+        pdf.multi_cell(w=190, h=7, txt="No especificado", border=0, align='J')
+    
+    pdf.ln(6)  # Espacio después del bloque (ajusta según necesites)
         
     seccion_titulo("2. Localización")
     for campo in ["municipio", "polígono", "parcela"]:
