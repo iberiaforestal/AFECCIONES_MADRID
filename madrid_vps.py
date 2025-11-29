@@ -1804,7 +1804,7 @@ if submitted:
             pdf_filename = f"informe_{uuid.uuid4().hex[:8]}.pdf"
             try:
                 generar_pdf(datos, x, y, pdf_filename)
-                st.session_state['pdf_file'] = pdf_filename
+                st.session_state['pdf_file'] = pdf_path
             except Exception as e:
                 st.error(f"Error al generar el PDF: {str(e)}")
 
