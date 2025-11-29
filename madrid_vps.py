@@ -542,8 +542,12 @@ def hay_espacio_suficiente(pdf, altura_necesaria, margen_inferior=20):
     return espacio_disponible >= altura_necesaria
 
 def generar_pdf(datos, x, y, filename):
-    logo_path = "logos.jpg"
+    # CARPETA PARA GUARDAR INFORMES DE MADRID
+    output_dir = "/home/ubuntu/informes/informes_madrid/"
+    os.makedirs(output_dir, exist_ok=True)
+    pdf_path = os.path.join(output_dir, filename)
 
+    logo_path = "logos.jpg"
     if not os.path.exists(logo_path):
         st.error("FALTA EL ARCHIVO: 'logos.jpg' en la raíz del proyecto.")
         st.markdown("Logo local: logos.jpg")
@@ -1627,7 +1631,7 @@ def generar_pdf(datos, x, y, filename):
         align="J"
     )
 
-    pdf.output(filename)
+    pdf.output(pdf_path)
     return filename
 
 # Interfaz de Streamlit
