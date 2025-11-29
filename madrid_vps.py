@@ -1792,7 +1792,7 @@ if submitted:
             # === 9. GENERAR MAPA ===
             mapa_html, afecciones_lista = crear_mapa(lon, lat, afecciones, parcela_gdf=parcela)
             if mapa_html:
-                st.session_state['mapa_html'] = mapa_html
+                st.session_state['mapa_html'] = f"/home/ubuntu/informes/informes_madrid/{mapa_html}"
                 st.session_state['afecciones'] = afecciones_lista
                 st.subheader("Resultado de las afecciones")
                 for afeccion in afecciones_lista:
