@@ -1802,6 +1802,7 @@ if submitted:
 
             # === 10. GENERAR PDF (AL FINAL, CUANDO `datos` EXISTE) ===
             pdf_filename = f"informe_{uuid.uuid4().hex[:8]}.pdf"
+            pdf_path = f"/home/ubuntu/informes/informes_madrid/{pdf_filename}"
             try:
                 generar_pdf(datos, x, y, pdf_filename)
                 st.session_state['pdf_file'] = pdf_path
