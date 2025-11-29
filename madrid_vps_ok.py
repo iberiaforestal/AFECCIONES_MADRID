@@ -456,9 +456,13 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
 
     uid = uuid.uuid4().hex[:8]
     mapa_html = f"mapa_{uid}.html"
-    m.save(mapa_html)
-
-    return mapa_html, afecciones
+    output_dir = "/home/ubuntu/informes/informes_madrid"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    mapa_html_path = os.path.join(output_dir, mapa_html)
+    m.save(mapa_html_path)
+    
+    return mapa_html_path, afecciones
 
 # Función para generar la imagen estática del mapa usando py-staticmaps
 def generar_imagen_estatica_mapa(x, y, zoom=16, size=(800, 600)):
@@ -1627,8 +1631,13 @@ def generar_pdf(datos, x, y, filename):
         align="J"
     )
 
-    pdf.output(filename)
-    return filename
+    output_dir = "/home/ubuntu/informes/informes_madrid"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    pdf_path = os.path.join(output_dir, filename)
+    pdf.output(pdf_path)
+    
+    return pdf_path
 
 # Interfaz de Streamlit
 st.image("logos.jpg",width=250) # ← más pequeño (prueba 160-200)
@@ -1786,21 +1795,26 @@ if submitted:
             st.write(f"Parcela seleccionada: {parcela_sel}")
 
             # === 9. GENERAR MAPA ===
-            mapa_html, afecciones_lista = crear_mapa(lon, lat, afecciones, parcela_gdf=parcela)
-            if mapa_html:
-                st.session_state['mapa_html'] = mapa_html
+            mapa_html_path, afecciones_lista = crear_mapa(lon, lat, afecciones, parcela_gdf=parcela)
+            
+            if mapa_html_path:
+                st.session_state['mapa_html'] = mapa_html_path      # ← guardas ruta absoluta
                 st.session_state['afecciones'] = afecciones_lista
+            
                 st.subheader("Resultado de las afecciones")
                 for afeccion in afecciones_lista:
                     st.write(f"• {afeccion}")
-                with open(mapa_html, 'r') as f:
+            
+                # Mostrar el HTML desde su ruta absoluta
+                with open(mapa_html_path, 'r', encoding='utf-8') as f:
                     html(f.read(), height=500)
+
 
             # === 10. GENERAR PDF (AL FINAL, CUANDO `datos` EXISTE) ===
             pdf_filename = f"informe_{uuid.uuid4().hex[:8]}.pdf"
             try:
-                generar_pdf(datos, x, y, pdf_filename)
-                st.session_state['pdf_file'] = pdf_filename
+                pdf_path = generar_pdf(datos, x, y, pdf_filename)   # ← ahora devuelve ruta completa
+                st.session_state['pdf_file'] = pdf_path             # ← guardamos ruta completa
             except Exception as e:
                 st.error(f"Error al generar el PDF: {str(e)}")
 
