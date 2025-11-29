@@ -456,7 +456,9 @@ def crear_mapa(lon, lat, afecciones=[], parcela_gdf=None):
 
     uid = uuid.uuid4().hex[:8]
     mapa_html = f"mapa_{uid}.html"
-    m.save(mapa_html)
+    mapa_path = f"/home/ubuntu/informes/informes_madrid/{mapa_html}"
+    os.makedirs("/home/ubuntu/informes/informes_madrid/", exist_ok=True)
+    m.save(mapa_path)
 
     return mapa_html, afecciones
 
