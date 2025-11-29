@@ -1640,208 +1640,211 @@ def generar_pdf(datos, x, y, filename):
     return pdf_path
 
 # Interfaz de Streamlit
-st.image("logos.jpg",width=250) # ← más pequeño (prueba 160-200)
-
-st.title("Informe Básico de Afecciones al Medio Natural")
-
-modo = st.radio("Seleccione el modo de búsqueda. Recuerde que la busqueda por parcela analiza afecciones al total de la superficie de la parcela, por el contrario la busqueda por coodenadas analiza las afecciones del punto", ["Por coordenadas", "Por parcela"])
-
-x = 0.0
-y = 0.0
-municipio_sel = ""
-masa_sel = ""
-parcela_sel = ""
-parcela = None
-
-if modo == "Por parcela":
-    municipio_sel = st.selectbox("Municipio", sorted(shp_urls.keys()))
-    archivo_base = shp_urls[municipio_sel]
+def main():
+    st.image("logos.jpg",width=250) # ← más pequeño (prueba 160-200)
     
-    gdf = cargar_shapefile_desde_github(archivo_base)
+    st.title("Informe Básico de Afecciones al Medio Natural")
     
-    if gdf is not None:
-        masa_sel = st.selectbox("Polígono", sorted(gdf["MASA"].unique()))
-        parcela_sel = st.selectbox("Parcela", sorted(gdf[gdf["MASA"] == masa_sel]["PARCELA"].unique()))
-        parcela = gdf[(gdf["MASA"] == masa_sel) & (gdf["PARCELA"] == parcela_sel)]
+    modo = st.radio("Seleccione el modo de búsqueda. Recuerde que la busqueda por parcela analiza afecciones al total de la superficie de la parcela, por el contrario la busqueda por coodenadas analiza las afecciones del punto", ["Por coordenadas", "Por parcela"])
+    
+    x = 0.0
+    y = 0.0
+    municipio_sel = ""
+    masa_sel = ""
+    parcela_sel = ""
+    parcela = None
+    
+    if modo == "Por parcela":
+        municipio_sel = st.selectbox("Municipio", sorted(shp_urls.keys()))
+        archivo_base = shp_urls[municipio_sel]
         
-        if parcela.geometry.geom_type.isin(['Polygon', 'MultiPolygon']).all():
-            centroide = parcela.geometry.centroid.iloc[0]
-            x = centroide.x
-            y = centroide.y         
-                    
-            st.success("Parcela cargada correctamente.")
-            st.write(f"Municipio: {municipio_sel}")
-            st.write(f"Polígono: {masa_sel}")
-            st.write(f"Parcela: {parcela_sel}")
-        else:
-            st.error("La geometría seleccionada no es un polígono válido.")
-    else:
-        st.error(f"No se pudo cargar el shapefile para el municipio: {municipio_sel}")
-
-with st.form("formulario"):
-    if modo == "Por coordenadas":
-        x = st.number_input("Coordenada X (ETRS89)", format="%.2f", help="Introduce coordenadas en metros, sistema ETRS89")
-        y = st.number_input("Coordenada Y (ETRS89)", format="%.2f")
-        if x != 0.0 and y != 0.0:
-            municipio_sel, masa_sel, parcela_sel, parcela = encontrar_municipio_poligono_parcela(x, y)
-            if municipio_sel != "N/A":
-                st.success(f"Parcela encontrada: Municipio: {municipio_sel}, Polígono: {masa_sel}, Parcela: {parcela_sel}")
-            else:
-                st.warning("No se encontró una parcela para las coordenadas proporcionadas.")
-    else:
-        st.info(f"Coordenadas obtenidas del centroide de la parcela: X = {x}, Y = {y}")
+        gdf = cargar_shapefile_desde_github(archivo_base)
         
-    nombre = st.text_input("Nombre")
-    apellidos = st.text_input("Apellidos")
-    dni = st.text_input("DNI")
-    direccion = st.text_input("Dirección")
-    telefono = st.text_input("Teléfono")
-    email = st.text_input("Correo electrónico")
-    objeto = st.text_area("Objeto de la solicitud", max_chars=255)
-    submitted = st.form_submit_button("Generar informe")
-
-if 'mapa_html' not in st.session_state:
-    st.session_state['mapa_html'] = None
-if 'pdf_file' not in st.session_state:
-    st.session_state['pdf_file'] = None
-if 'afecciones' not in st.session_state:
-    st.session_state['afecciones'] = []
-
-if submitted:
-# === 1. LIMPIAR ARCHIVOS DE BÚSQUEDAS ANTERIORES ===
-    for key in ['mapa_html', 'pdf_file']:
-        if key in st.session_state and st.session_state[key]:
-            try:
-                if os.path.exists(st.session_state[key]):
-                    os.remove(st.session_state[key])
-            except:
-                pass
-    st.session_state.pop('mapa_html', None)
-    st.session_state.pop('pdf_file', None)
-
-    # === 2. VALIDAR CAMPOS OBLIGATORIOS ===
-    if not nombre or not apellidos or not dni or x == 0 or y == 0:
-        st.warning("Por favor, completa todos los campos obligatorios y asegúrate de que las coordenadas son válidas.")
-    else:
-        # === 3. TRANSFORMAR COORDENADAS ===
-        lon, lat = transformar_coordenadas(x, y)
-        if lon is None or lat is None:
-            st.error("No se pudo generar el informe debido a coordenadas inválidas.")
-        else:
-            # === 4. DEFINIR query_geom (UNA VEZ) ===
-            if modo == "Por parcela":
-                query_geom = parcela.geometry.iloc[0]
+        if gdf is not None:
+            masa_sel = st.selectbox("Polígono", sorted(gdf["MASA"].unique()))
+            parcela_sel = st.selectbox("Parcela", sorted(gdf[gdf["MASA"] == masa_sel]["PARCELA"].unique()))
+            parcela = gdf[(gdf["MASA"] == masa_sel) & (gdf["PARCELA"] == parcela_sel)]
+            
+            if parcela.geometry.geom_type.isin(['Polygon', 'MultiPolygon']).all():
+                centroide = parcela.geometry.centroid.iloc[0]
+                x = centroide.x
+                y = centroide.y         
+                        
+                st.success("Parcela cargada correctamente.")
+                st.write(f"Municipio: {municipio_sel}")
+                st.write(f"Polígono: {masa_sel}")
+                st.write(f"Parcela: {parcela_sel}")
             else:
-                query_geom = Point(x, y)
-
-            # === 5. GUARDAR query_geom Y URLs EN SESSION_STATE ===
-            st.session_state['query_geom'] = query_geom
-            corredores_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_CORREDORES_ECO&outputFormat=application/json"
-            humedales_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_CEH_HUMEDALES&outputFormat=application/json"
-            biosfera_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RESERVA_BIOS&outputFormat=application/json"
-            nitratos_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_ZONAS_VULNERAB&outputFormat=application/json"                           
-            uso_suelo_url = "https://idem.comunidad.madrid/geoidem/UsoDelSuelo/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=UsoDelSuelo:IDEM_URB_GEN_CALI_CLASI_10&outputFormat=application/json"
-            enp_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_ENP&outputFormat=application/json"
-            zepa_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RED_NATURA_ZEPA&outputFormat=application/json"
-            lic_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RED_NATURA_LIC_ZEC&outputFormat=application/json"
-            vp_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_VIAS_PECUARIAS&outputFormat=application/json"
-            mup_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_MONTES_UP&outputFormat=application/json"
-            st.session_state['wfs_urls'] = {
-                'enp': enp_url, 'zepa': zepa_url, 'lic': lic_url,
-                'vp': vp_url, 'mup': mup_url, 
-                'corredores': corredores_url,
-                'uso_suelo': uso_suelo_url,
-                'humedales': humedales_url,
-                'biosfera': biosfera_url,
-                'nitratos': nitratos_url
-            }
-
-            # === 6. CONSULTAR AFECCIONES ===
-            afeccion_corredores = consultar_wfs_seguro(query_geom, corredores_url, "CORREDOR", campo_nombre="DS_TIPO_CORREDOR")
-            afeccion_humedales = consultar_wfs_seguro(query_geom, humedales_url, "HUMEDALES", campo_nombre="DS_ZONA")
-            afeccion_biosfera = consultar_wfs_seguro(query_geom, biosfera_url, "BIOESFERA", campo_nombre="CD_RESERVA")
-            afeccion_nitratos = consultar_wfs_seguro(query_geom, nitratos_url, "NATRATOS", campo_nombre="CD_ZONA")           
-            afeccion_uso_suelo = consultar_wfs_seguro(query_geom, uso_suelo_url, "PLANEAMIENTO", campo_nombre="DS_CLASI")            
-            afeccion_enp = consultar_wfs_seguro(query_geom, enp_url, "ENP", campo_nombre="DS_NOMBRE")
-            afeccion_zepa = consultar_wfs_seguro(query_geom, zepa_url, "ZEPA", campo_nombre="DS_ZEPA")
-            afeccion_lic = consultar_wfs_seguro(query_geom, lic_url, "LIC", campo_nombre="DS_ZEC_NAME")
-            afeccion_vp = consultar_wfs_seguro(query_geom, vp_url, "VP", campo_nombre="DS_NOMBRE")            
-            afeccion_mup = consultar_wfs_seguro(
-                query_geom, mup_url, "MUP",
-                campos_mup=["CD_UP:ID", "DS_NOMBRE:Nombre", "DS_MUNICIPIO:Municipio", "DS_PROPIETARIO:Propiedad"]
+                st.error("La geometría seleccionada no es un polígono válido.")
+        else:
+            st.error(f"No se pudo cargar el shapefile para el municipio: {municipio_sel}")
+    
+    with st.form("formulario"):
+        if modo == "Por coordenadas":
+            x = st.number_input("Coordenada X (ETRS89)", format="%.2f", help="Introduce coordenadas en metros, sistema ETRS89")
+            y = st.number_input("Coordenada Y (ETRS89)", format="%.2f")
+            if x != 0.0 and y != 0.0:
+                municipio_sel, masa_sel, parcela_sel, parcela = encontrar_municipio_poligono_parcela(x, y)
+                if municipio_sel != "N/A":
+                    st.success(f"Parcela encontrada: Municipio: {municipio_sel}, Polígono: {masa_sel}, Parcela: {parcela_sel}")
+                else:
+                    st.warning("No se encontró una parcela para las coordenadas proporcionadas.")
+        else:
+            st.info(f"Coordenadas obtenidas del centroide de la parcela: X = {x}, Y = {y}")
+            
+        nombre = st.text_input("Nombre")
+        apellidos = st.text_input("Apellidos")
+        dni = st.text_input("DNI")
+        direccion = st.text_input("Dirección")
+        telefono = st.text_input("Teléfono")
+        email = st.text_input("Correo electrónico")
+        objeto = st.text_area("Objeto de la solicitud", max_chars=255)
+        submitted = st.form_submit_button("Generar informe")
+    
+    if 'mapa_html' not in st.session_state:
+        st.session_state['mapa_html'] = None
+    if 'pdf_file' not in st.session_state:
+        st.session_state['pdf_file'] = None
+    if 'afecciones' not in st.session_state:
+        st.session_state['afecciones'] = []
+    
+    if submitted:
+    # === 1. LIMPIAR ARCHIVOS DE BÚSQUEDAS ANTERIORES ===
+        for key in ['mapa_html', 'pdf_file']:
+            if key in st.session_state and st.session_state[key]:
+                try:
+                    if os.path.exists(st.session_state[key]):
+                        os.remove(st.session_state[key])
+                except:
+                    pass
+        st.session_state.pop('mapa_html', None)
+        st.session_state.pop('pdf_file', None)
+    
+        # === 2. VALIDAR CAMPOS OBLIGATORIOS ===
+        if not nombre or not apellidos or not dni or x == 0 or y == 0:
+            st.warning("Por favor, completa todos los campos obligatorios y asegúrate de que las coordenadas son válidas.")
+        else:
+            # === 3. TRANSFORMAR COORDENADAS ===
+            lon, lat = transformar_coordenadas(x, y)
+            if lon is None or lat is None:
+                st.error("No se pudo generar el informe debido a coordenadas inválidas.")
+            else:
+                # === 4. DEFINIR query_geom (UNA VEZ) ===
+                if modo == "Por parcela":
+                    query_geom = parcela.geometry.iloc[0]
+                else:
+                    query_geom = Point(x, y)
+    
+                # === 5. GUARDAR query_geom Y URLs EN SESSION_STATE ===
+                st.session_state['query_geom'] = query_geom
+                corredores_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_CORREDORES_ECO&outputFormat=application/json"
+                humedales_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_CEH_HUMEDALES&outputFormat=application/json"
+                biosfera_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RESERVA_BIOS&outputFormat=application/json"
+                nitratos_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_ZONAS_VULNERAB&outputFormat=application/json"                           
+                uso_suelo_url = "https://idem.comunidad.madrid/geoidem/UsoDelSuelo/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=UsoDelSuelo:IDEM_URB_GEN_CALI_CLASI_10&outputFormat=application/json"
+                enp_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_ENP&outputFormat=application/json"
+                zepa_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RED_NATURA_ZEPA&outputFormat=application/json"
+                lic_url = "https://idem.comunidad.madrid/geoidem/LugaresProtegidos/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=LugaresProtegidos:IDEM_MA_RED_NATURA_LIC_ZEC&outputFormat=application/json"
+                vp_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_VIAS_PECUARIAS&outputFormat=application/json"
+                mup_url = "https://idem.comunidad.madrid/geoidem/Zonas/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Zonas:IDEM_MA_MONTES_UP&outputFormat=application/json"
+                st.session_state['wfs_urls'] = {
+                    'enp': enp_url, 'zepa': zepa_url, 'lic': lic_url,
+                    'vp': vp_url, 'mup': mup_url, 
+                    'corredores': corredores_url,
+                    'uso_suelo': uso_suelo_url,
+                    'humedales': humedales_url,
+                    'biosfera': biosfera_url,
+                    'nitratos': nitratos_url
+                }
+    
+                # === 6. CONSULTAR AFECCIONES ===
+                afeccion_corredores = consultar_wfs_seguro(query_geom, corredores_url, "CORREDOR", campo_nombre="DS_TIPO_CORREDOR")
+                afeccion_humedales = consultar_wfs_seguro(query_geom, humedales_url, "HUMEDALES", campo_nombre="DS_ZONA")
+                afeccion_biosfera = consultar_wfs_seguro(query_geom, biosfera_url, "BIOESFERA", campo_nombre="CD_RESERVA")
+                afeccion_nitratos = consultar_wfs_seguro(query_geom, nitratos_url, "NATRATOS", campo_nombre="CD_ZONA")           
+                afeccion_uso_suelo = consultar_wfs_seguro(query_geom, uso_suelo_url, "PLANEAMIENTO", campo_nombre="DS_CLASI")            
+                afeccion_enp = consultar_wfs_seguro(query_geom, enp_url, "ENP", campo_nombre="DS_NOMBRE")
+                afeccion_zepa = consultar_wfs_seguro(query_geom, zepa_url, "ZEPA", campo_nombre="DS_ZEPA")
+                afeccion_lic = consultar_wfs_seguro(query_geom, lic_url, "LIC", campo_nombre="DS_ZEC_NAME")
+                afeccion_vp = consultar_wfs_seguro(query_geom, vp_url, "VP", campo_nombre="DS_NOMBRE")            
+                afeccion_mup = consultar_wfs_seguro(
+                    query_geom, mup_url, "MUP",
+                    campos_mup=["CD_UP:ID", "DS_NOMBRE:Nombre", "DS_MUNICIPIO:Municipio", "DS_PROPIETARIO:Propiedad"]
+                )
+                afecciones = [afeccion_corredores, afeccion_humedales, afeccion_biosfera, afeccion_nitratos, afeccion_uso_suelo, afeccion_enp, afeccion_zepa, afeccion_lic, afeccion_vp, afeccion_mup]
+    
+                # === 7. CREAR DICCIONARIO `datos` ===
+                datos = {
+                    "fecha_informe": datetime.today().strftime('%d/%m/%Y'),
+                    "nombre": nombre, "apellidos": apellidos, "dni": dni,
+                    "dirección": direccion, "teléfono": telefono, "email": email,
+                    "objeto de la solicitud": objeto,
+                    "afección MUP": afeccion_mup, "afección VP": afeccion_vp,
+                    "afección ENP": afeccion_enp, "afección ZEPA": afeccion_zepa,
+                    "afección LIC": afeccion_lic, "afección uso_suelo": afeccion_uso_suelo,
+                    "afección corredores": afeccion_corredores,
+                    "afección humedales": afeccion_humedales,
+                    "afección biosfera": afeccion_biosfera,
+                    "afección nitratos": afeccion_nitratos,
+                    "coordenadas_x": x, "coordenadas_y": y,
+                    "municipio": municipio_sel, "polígono": masa_sel, "parcela": parcela_sel 
+                }
+    
+                # === 8. MOSTRAR RESULTADOS EN PANTALLA ===
+                st.write(f"Municipio seleccionado: {municipio_sel}")
+                st.write(f"Polígono seleccionado: {masa_sel}")
+                st.write(f"Parcela seleccionada: {parcela_sel}")
+    
+                # === 9. GENERAR MAPA ===
+                mapa_html_path, afecciones_lista = crear_mapa(lon, lat, afecciones, parcela_gdf=parcela)
+                
+                if mapa_html_path:
+                    st.session_state['mapa_html'] = mapa_html_path      # ← guardas ruta absoluta
+                    st.session_state['afecciones'] = afecciones_lista
+                
+                    st.subheader("Resultado de las afecciones")
+                    for afeccion in afecciones_lista:
+                        st.write(f"• {afeccion}")
+                
+                    # Mostrar el HTML desde su ruta absoluta
+                    with open(mapa_html_path, 'r', encoding='utf-8') as f:
+                        html(f.read(), height=500)
+    
+    
+                # === 10. GENERAR PDF (AL FINAL, CUANDO `datos` EXISTE) ===
+                pdf_filename = f"informe_{uuid.uuid4().hex[:8]}.pdf"
+                try:
+                    pdf_path = generar_pdf(datos, x, y, pdf_filename)   # ← ahora devuelve ruta completa
+                    st.session_state['pdf_file'] = pdf_path             # ← guardamos ruta completa
+                except Exception as e:
+                    st.error(f"Error al generar el PDF: {str(e)}")
+    
+                # === 11. LIMPIAR DATOS TEMPORALES ===
+                st.session_state.pop('query_geom', None)
+                st.session_state.pop('wfs_urls', None)
+    if st.session_state.get('mapa_html') and st.session_state.get('pdf_file'):
+        try:
+            # Crear un ZIP en memoria con los dos archivos
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                # Añadir el PDF
+                with open(st.session_state['pdf_file'], "rb") as f:
+                    zip_file.writestr("informe_afecciones.pdf", f.read())
+                
+                # Añadir el mapa HTML
+                with open(st.session_state['mapa_html'], "rb") as f:
+                    zip_file.writestr("mapa_interactivo.html", f.read())
+            
+            zip_buffer.seek(0)
+            
+            st.download_button(
+                label="Descargar informe completo (PDF + Mapa interactivo)",
+                data=zip_buffer,
+                file_name="informe_completo_afecciones.zip",
+                mime="application/zip"
             )
-            afecciones = [afeccion_corredores, afeccion_humedales, afeccion_biosfera, afeccion_nitratos, afeccion_uso_suelo, afeccion_enp, afeccion_zepa, afeccion_lic, afeccion_vp, afeccion_mup]
-
-            # === 7. CREAR DICCIONARIO `datos` ===
-            datos = {
-                "fecha_informe": datetime.today().strftime('%d/%m/%Y'),
-                "nombre": nombre, "apellidos": apellidos, "dni": dni,
-                "dirección": direccion, "teléfono": telefono, "email": email,
-                "objeto de la solicitud": objeto,
-                "afección MUP": afeccion_mup, "afección VP": afeccion_vp,
-                "afección ENP": afeccion_enp, "afección ZEPA": afeccion_zepa,
-                "afección LIC": afeccion_lic, "afección uso_suelo": afeccion_uso_suelo,
-                "afección corredores": afeccion_corredores,
-                "afección humedales": afeccion_humedales,
-                "afección biosfera": afeccion_biosfera,
-                "afección nitratos": afeccion_nitratos,
-                "coordenadas_x": x, "coordenadas_y": y,
-                "municipio": municipio_sel, "polígono": masa_sel, "parcela": parcela_sel 
-            }
-
-            # === 8. MOSTRAR RESULTADOS EN PANTALLA ===
-            st.write(f"Municipio seleccionado: {municipio_sel}")
-            st.write(f"Polígono seleccionado: {masa_sel}")
-            st.write(f"Parcela seleccionada: {parcela_sel}")
-
-            # === 9. GENERAR MAPA ===
-            mapa_html_path, afecciones_lista = crear_mapa(lon, lat, afecciones, parcela_gdf=parcela)
             
-            if mapa_html_path:
-                st.session_state['mapa_html'] = mapa_html_path      # ← guardas ruta absoluta
-                st.session_state['afecciones'] = afecciones_lista
-            
-                st.subheader("Resultado de las afecciones")
-                for afeccion in afecciones_lista:
-                    st.write(f"• {afeccion}")
-            
-                # Mostrar el HTML desde su ruta absoluta
-                with open(mapa_html_path, 'r', encoding='utf-8') as f:
-                    html(f.read(), height=500)
-
-
-            # === 10. GENERAR PDF (AL FINAL, CUANDO `datos` EXISTE) ===
-            pdf_filename = f"informe_{uuid.uuid4().hex[:8]}.pdf"
-            try:
-                pdf_path = generar_pdf(datos, x, y, pdf_filename)   # ← ahora devuelve ruta completa
-                st.session_state['pdf_file'] = pdf_path             # ← guardamos ruta completa
-            except Exception as e:
-                st.error(f"Error al generar el PDF: {str(e)}")
-
-            # === 11. LIMPIAR DATOS TEMPORALES ===
-            st.session_state.pop('query_geom', None)
-            st.session_state.pop('wfs_urls', None)
-if st.session_state.get('mapa_html') and st.session_state.get('pdf_file'):
-    try:
-        # Crear un ZIP en memoria con los dos archivos
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            # Añadir el PDF
-            with open(st.session_state['pdf_file'], "rb") as f:
-                zip_file.writestr("informe_afecciones.pdf", f.read())
-            
-            # Añadir el mapa HTML
-            with open(st.session_state['mapa_html'], "rb") as f:
-                zip_file.writestr("mapa_interactivo.html", f.read())
-        
-        zip_buffer.seek(0)
-        
-        st.download_button(
-            label="Descargar informe completo (PDF + Mapa interactivo)",
-            data=zip_buffer,
-            file_name="informe_completo_afecciones.zip",
-            mime="application/zip"
-        )
-        
-    except Exception as e:
-        st.error(f"Error al crear el archivo ZIP: {str(e)}")
+        except Exception as e:
+            st.error(f"Error al crear el archivo ZIP: {str(e)}")
+if __name__ == "__main__":
+    main()
