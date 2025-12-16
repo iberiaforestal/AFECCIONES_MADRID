@@ -1835,7 +1835,36 @@ def main():
                     st.session_state['pdf_file'] = pdf_path             # ← guardamos ruta completa
                 except Exception as e:
                     st.error(f"Error al generar el PDF: {str(e)}")
-    
+                # === 10.b REGISTRAR INFORME EN BACKEND ===
+                if not st.session_state.get("informe_registrado"):
+                    try:
+                        response = requests.post(
+                            "https://plataforma.iberiaforestal.es/api/informes/registrar",
+                            headers={
+                                "Authorization": f"Bearer {st.session_state.get('token')}"
+                            },
+                            json={
+                                "pais": st.session_state.get("pais"),
+                                "ccaa": "Madrid",
+                                "provincia": "Madrid",
+                                "ayuntamiento": st.session_state.get("ayuntamiento"),
+                                "nombre": st.session_state.get("nombre"),
+                                "apellidos": st.session_state.get("apellidos"),
+                                "dni": st.session_state.get("dni"),
+                                "email": st.session_state.get("email"),
+                                "ruta_pdf": st.session_state['pdf_file'],
+                                "ruta_html": st.session_state['mapa_html'],
+                            },
+                            timeout=10
+                        )
+                        st.write("📡 registrar_informe →", response.status_code, response.text)
+                        if response.status_code == 200:
+                            st.session_state["informe_registrado"] = True
+                        else:
+                            st.error("❌ Error al registrar informe en backend")
+                    except Exception as e:
+                        st.error(f"🔥 Error POST registrar informe: {e}")
+     
                 # === 11. LIMPIAR DATOS TEMPORALES ===
                 st.session_state.pop('query_geom', None)
                 st.session_state.pop('wfs_urls', None)
